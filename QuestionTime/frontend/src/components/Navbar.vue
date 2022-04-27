@@ -4,7 +4,7 @@
       <router-link 
         :to="{ name: 'home' }" 
         class="navbar-brand"
-        >QuestionTime
+        >WeSolve
       </router-link>
 
       <div class="collapse navbar-collapse">
@@ -14,6 +14,27 @@
               :to="{ name: 'home' }" 
               class="btn btn-sm btn-success"
               >Home
+            </router-link>
+          </li>
+          <li class="nav-item active">
+            <router-link
+              :to="{ name: 'profile' }"
+              class="btn btn-sm btn-success"
+              >Profile
+            </router-link>
+          </li>
+          <li class="nav-item active">
+            <router-link
+              :to="{ name: 'about-us' }"
+              class="btn btn-sm btn-success"
+              >About Us
+            </router-link>
+          </li>
+          <li class="nav-item active">
+            <router-link
+              :to="{ name: 'contact-us' }"
+              class="btn btn-sm btn-success"
+              >Contact Us
             </router-link>
           </li>
           <li class="nav-item mx-1">
@@ -52,5 +73,10 @@ export default {
 
 .navbar-brand:hover {
   color: #dc3545 !important;
+}
+
+
+.nav-item {
+  padding: .15rem;
 }
 </style>
