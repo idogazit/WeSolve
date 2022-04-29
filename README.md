@@ -1,24 +1,26 @@
 # WeSolve
-**A Quora-like Single Page Application built with Django, Django REST Framework and Vue JS**
 
 ## Instructions for Windows set up
-python -m venv venv
+```python -m venv venv
 call ./Scripts/activate.bat
 pip install -r ./requirements.txt
+```
 
+```
 for client side:
 cd WeSolve/frontend
 npm install
 npm run serve
+```
 
+```
 for server side:
 cd WeSolve
 python manage.py migrate
 python manage.py runserver
+```
 
 ## Instructions for Mac/Ubuntu set up
-
-## How to set up the project to run on your local machine?
 
 #### Download the code to your PC, unpack the zip and move inside the folder.
 
