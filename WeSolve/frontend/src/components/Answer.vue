@@ -15,16 +15,48 @@
         @click="triggerDeleteAnswer"
         >Delete
       </button>
+      <br/>
+      <button
+        class="btn btn-sm"
+        @click="toggleUpvote"
+        :class="{
+          'btn-success': userUpvotedAnswer,
+          'btn-outline-success': !userUpvotedAnswer
+          }"
+        disabled
+        ><strong>Upvote [{{ upvotesCounter }}]</strong>
+      </button>
+      <button
+        class="btn btn-sm"
+        @click="toggleUpvote"
+        :class="{
+          'btn-danger': userUpvotedAnswer,
+          'btn-outline-danger': !userUpvotedAnswer
+          }"
+        disabled
+        ><strong>Downvote [{{ upvotesCounter }}]</strong>
+      </button>
     </div>
     <div v-else>      
       <button
         class="btn btn-sm"
-        @click="toggleLike"
+        @click="toggleUpvote"
         :class="{
-          'btn-danger': userLikedAnswer,
-          'btn-outline-danger': !userLikedAnswer
+          'btn-success': userUpvotedAnswer,
+          'btn-outline-success': !userUpvotedAnswer,
           }"
-        ><strong>Like [{{ likesCounter }}]</strong>
+        :disabled=userDownvotedAnswer
+        ><strong>Upvote [{{ upvotesCounter }}]</strong>
+      </button>
+      <button
+        class="btn btn-sm"
+        @click="toggleDownvote"
+        :class="{
+          'btn-danger': userDownvotedAnswer,
+          'btn-outline-danger': !userDownvotedAnswer
+          }"
+        :disabled=userUpvotedAnswer
+        ><strong>Downvote [{{ downvotesCounter }}]</strong>
       </button>
     </div>
     <hr>
@@ -47,8 +79,10 @@ export default {
   },
   data() {
     return {
-      userLikedAnswer: this.answer.user_has_voted,
-      likesCounter: this.answer.likes_count
+      userUpvotedAnswer: this.answer.user_has_voted, // TODO: needs to be replaced with user_has_upvoted
+      upvotesCounter: this.answer.likes_count, // TODO: needs to be replaced with upvotes_count
+      userDownvotedAnswer: this.answer.user_has_downvoted,
+      downvotesCounter: this.answer.downvotes_count
     }
   },
   computed: {
@@ -58,20 +92,37 @@ export default {
     }
   },
   methods: {
-    toggleLike() {
-      this.userLikedAnswer === false
-        ? this.likeAnswer()
-        : this.unLikeAnswer()
+    toggleUpvote() {
+      this.userUpvotedAnswer === false
+        ? this.upvoteAnswer()
+        : this.unUpvoteAnswer()
     },
-    likeAnswer() {
-      this.userLikedAnswer = true;
-      this.likesCounter += 1;
+    upvoteAnswer() {
+      this.userUpvotedAnswer = true;
+      this.upvotesCounter += 1;
       let endpoint = `/api/answers/${ this.answer.id }/like/`;
       apiService(endpoint, "POST")
     },
-    unLikeAnswer() {
-      this.userLikedAnswer = false;
-      this.likesCounter -= 1;
+    unUpvoteAnswer() {
+      this.userUpvotedAnswer = false;
+      this.upvotesCounter -= 1;
+      let endpoint = `/api/answers/${ this.answer.id }/like/`;
+      apiService(endpoint, "DELETE")
+    },
+    toggleDownvote() {
+      this.userDownvotedAnswer === false
+        ? this.downvoteAnswer()
+        : this.unDownvoteAnswer()
+    },
+    downvoteAnswer() {
+      this.userDownvotedAnswer = true;
+      this.downvotesCounter += 1;
+      let endpoint = `/api/answers/${ this.answer.id }/like/`;
+      apiService(endpoint, "POST")
+    },
+    unDownvoteAnswer() {
+      this.userDownvotedAnswer = false;
+      this.downvotesCounter -= 1;
       let endpoint = `/api/answers/${ this.answer.id }/like/`;
       apiService(endpoint, "DELETE")
     },
