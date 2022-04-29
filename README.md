@@ -1,4 +1,4 @@
-# QuestionTime
+# WeSolve
 **A Quora-like Single Page Application built with Django, Django REST Framework and Vue JS**
 
 This is the source code of the Final Project of my Udemy Course "*The Complete Guide to Django REST Framework and Vue JS*", where you can learn how to build professional Single Page Applications with Django and Vue JS. 
@@ -33,7 +33,7 @@ pip install -m ./requirements.txt
 
 #### Time to install the Vue JS dependencies:
 ```
-cd QuestionTime/frontend
+cd WeSolve/frontend
 npm install
 ```
 

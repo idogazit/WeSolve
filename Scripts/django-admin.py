@@ -1,4 +1,4 @@
-#!c:\users\ido\questiontime\questiontime-legacy-v1\scripts\python.exe
+#!c:\users\ido\WeSolve\WeSolve\scripts\python.exe
 from django.core import management
 
 if __name__ == "__main__":

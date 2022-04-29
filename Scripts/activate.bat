@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=C:\Users\Ido\QuestionTime\QuestionTime-legacy-v1"
+set "VIRTUAL_ENV=C:\Users\Ido\WeSolve\WeSolve"
 
 if not defined PROMPT (
     set "PROMPT=$P$G"
@@ -23,7 +23,7 @@ if defined _OLD_VIRTUAL_PYTHONHOME (
 )
 
 set "_OLD_VIRTUAL_PROMPT=%PROMPT%"
-set "PROMPT=(QuestionTime-legacy-v1) %PROMPT%"
+set "PROMPT=(WeSolve) %PROMPT%"
 
 if defined PYTHONHOME (
     set "_OLD_VIRTUAL_PYTHONHOME=%PYTHONHOME%"
