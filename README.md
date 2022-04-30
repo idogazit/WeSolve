@@ -13,19 +13,20 @@ call ./Scripts/activate.bat
 pip install -r ./requirements.txt
 ```
 
-```
 for client side:
+```
 cd WeSolve/frontend
 npm install
 npm run serve
 ```
 
-```
 for server side:
+```
 cd WeSolve
 python manage.py migrate
 python manage.py runserver
 ```
+#### Open up Chrome and go to 127.0.0.1:8000 and the app is now running in development mode!
 
 ## Instructions for Mac/Ubuntu set up
 
@@ -60,5 +61,3 @@ npm run serve
 ```
 python manage.py runserver
 ```
-
-#### Open up Chrome and go to 127.0.0.1:8000 and the app is now running in development mode!
