@@ -2,10 +2,10 @@
 
 Data-Centered Crowd Sourcing Project by:
 
-Nir Swartz
-Guy Shnaider
-Ido Gazit
-Itai Weiss
+- Nir Swartz
+- Guy Shnaider
+- Ido Gazit
+- Itai Weiss
 
 ## Instructions for Windows set up
 ```python -m venv venv
