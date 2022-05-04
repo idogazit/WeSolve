@@ -2,11 +2,34 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+class Faculty(models.Model):
+    facultyId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    facultyName = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return f'{self.facultyName}'
+
+    class Meta:
+        db_table = 'Faculties'
+
+
+class School(models.Model):
+    schoolId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    schoolName = models.CharField(max_length=50, unique=True)
+    facultyName = models.ForeignKey(Faculty, default='Exact Science', on_delete=models.DO_NOTHING, to_field='facultyName')
+
+    def __str__(self):
+        return f'{self.schoolName}'
+
+    class Meta:
+        db_table = 'Schools'
+
 
 class Course(models.Model):
     courseId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     courseName = models.CharField(max_length=50, unique=True)
     courseNumber = models.CharField(max_length=50, unique=True)
+    schoolName = models.ForeignKey(School, default='Computer Science', on_delete=models.DO_NOTHING, to_field='schoolName')
     # participants attribute is ManyToManyField relation to Users
 
     def __str__(self):
