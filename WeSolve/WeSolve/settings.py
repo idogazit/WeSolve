@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-
+    
     'rest_framework',
     'rest_framework.authtoken',
 
@@ -145,9 +145,6 @@ STATICFILES_DIRS = [
 ]
 
 # STATIC_ROOT = "" # The absolute path to the directory where collectstatic will collect static files for deployment.
-
-# Custom User Model
-AUTH_USER_MODEL = "users.CustomUser"
 
 # django-crispy-forms
 CRISPY_TEMPLATE_PACK = "bootstrap4"

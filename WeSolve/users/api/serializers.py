@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from users.models import CustomUser
+from users.forms import NewUserForm
 
 
 class UserDisplaySerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = CustomUser
+        model = NewUserForm
         fields = ["username"]

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from questions.models import Answer, Question
+from questions.models import Solution, Question
 
 
 class AnswerSerializer(serializers.ModelSerializer):
@@ -10,7 +10,7 @@ class AnswerSerializer(serializers.ModelSerializer):
     question_slug = serializers.SerializerMethodField()
 
     class Meta:
-        model = Answer
+        model = Solution
         exclude = ["question", "voters", "updated_at"]
 
     def get_created_at(self, instance):

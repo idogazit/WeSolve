@@ -7,12 +7,12 @@ from rest_framework.views import APIView
 
 from questions.api.permissions import IsAuthorOrReadOnly
 from questions.api.serializers import AnswerSerializer, QuestionSerializer
-from questions.models import Answer, Question
+from questions.models import Solution, Question
 
 
 class AnswerCreateAPIView(generics.CreateAPIView):
     """Allow users to answer a question instance if they haven't already."""
-    queryset = Answer.objects.all()
+    queryset = Solution.objects.all()
     serializer_class = AnswerSerializer
     permission_classes = [IsAuthenticated]
 
@@ -34,7 +34,7 @@ class AnswerLikeAPIView(APIView):
 
     def delete(self, request, pk):
         """Remove request.user from the voters queryset of an answer instance."""
-        answer = get_object_or_404(Answer, pk=pk)
+        answer = get_object_or_404(Solution, pk=pk)
         user = request.user
 
         answer.voters.remove(user)
@@ -47,7 +47,7 @@ class AnswerLikeAPIView(APIView):
 
     def post(self, request, pk):
         """Add request.user to the voters queryset of an answer instance."""
-        answer = get_object_or_404(Answer, pk=pk)
+        answer = get_object_or_404(Solution, pk=pk)
         user = request.user
 
         answer.voters.add(user)
@@ -66,12 +66,12 @@ class AnswerListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         kwarg_slug = self.kwargs.get("slug")
-        return Answer.objects.filter(question__slug=kwarg_slug).order_by("-created_at")
+        return Solution.objects.filter(question__slug=kwarg_slug).order_by("-created_at")
 
 
 class AnswerRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
     """Provide *RUD functionality for an answer instance to it's author."""
-    queryset = Answer.objects.all()
+    queryset = Solution.objects.all()
     serializer_class = AnswerSerializer
     permission_classes = [IsAuthenticated, IsAuthorOrReadOnly]
 
