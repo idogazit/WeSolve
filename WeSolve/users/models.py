@@ -29,12 +29,12 @@ class CustomUser(AbstractUser):
 
     def upload_location(self, filename):
         suffix = (filename.split('.'))[len(filename.split('.')) - 1]
-        return f'/uploads/userPics/{self.username}_userPic.{suffix}'
+        return f'users/uploads/userPics/{self.username}_userPic.{suffix}'
 
     userId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     courses = models.ManyToManyField(Course, related_name='participants', blank=True) # userCourses relation
     rank = models.IntegerField(choices=Rank.choices, default=Rank.FRESHMAN)
-    userPic = models.ImageField(upload_to=upload_location, default="/uploads/userPics/default_userPic.png")
+    userPic = models.ImageField(upload_to=upload_location, default="users/uploads/userPics/default_userPic.png")
     isTeacher = models.BooleanField(default=False)
 
     def __str__(self):
