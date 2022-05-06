@@ -85,8 +85,8 @@ class Answer(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, to_field='username')
     answerPic = models.ImageField(upload_to=upload_location, default='')
     # body = models.TextField()
-    downvoters = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="upvotes", blank=True)
-    upvoters = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="downvotes", blank=True)
+    downvoters = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="downvotes", blank=True)
+    upvoters = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="upvotes", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
