@@ -7,7 +7,6 @@ import users.models as usersModels
 class Exam(models.Model):
     examId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     courseName = models.ForeignKey(usersModels.Course, on_delete=models.DO_NOTHING, to_field='courseName')
-    teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, to_field='username', limit_choices_to={'isTeacher': True}) 
     year = models.IntegerField(default=2022)
     semester = models.CharField(max_length=1, choices=[('A', 'A'), ('B', 'B')], default=('A', 'A'))
     examType = models.CharField(max_length=1, choices=[('A', 'A'), ('B', 'B')], default=('A', 'A')) # moed A or B
@@ -27,10 +26,10 @@ class Question(models.Model):
 
     questionId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     examId = models.ForeignKey(Exam, on_delete=models.DO_NOTHING, to_field='examId')
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="questions", default='cdf09df6-6e9e-42b0-928b-b119ce4f86bb', limit_choices_to={'isTeacher': True})
     questionPic = models.ImageField(upload_to=upload_location, default='')
     content = models.CharField(max_length=240, default='', blank=True)
     slug = models.SlugField(max_length=255, default='', blank=True)
-    # author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="questions")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
