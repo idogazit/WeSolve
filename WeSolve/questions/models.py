@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.conf import settings
 import users.models as usersModels
+from django.core.validators import FileExtensionValidator
 
 
 class Exam(models.Model):
@@ -21,14 +22,13 @@ class Exam(models.Model):
 class Question(models.Model):
 
     def upload_location(self, filename):
-        suffix = (filename.split('.'))[len(filename.split('.')) - 1]
-        return f'questions/uploads/questionsPics/{self.questionId}_questionPic.{suffix}'
+        return f'questions/uploads/questionsPDF/{self.questionId}_question.pdf'
 
     questionId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    examId = models.ForeignKey(Exam, on_delete=models.CASCADE, to_field='examId')
+    examUniqueName = models.ForeignKey(Exam, on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="questions", default='cdf09df6-6e9e-42b0-928b-b119ce4f86bb', limit_choices_to={'isTeacher': True})
-    questionPic = models.ImageField(upload_to=upload_location, default='')
-    content = models.CharField(max_length=240, default='', blank=True)
+    content = models.CharField(max_length=240, default='') # Question number
+    questionPDF = models.FileField(upload_to=upload_location, default='', validators=[FileExtensionValidator(['pdf'])])
     slug = models.SlugField(max_length=255, default='', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -76,14 +76,13 @@ class QuestionLabel(models.Model):
 class Answer(models.Model):
 
     def upload_location(self, filename):
-        suffix = (filename.split('.'))[len(filename.split('.')) - 1]
-        return f'questions/uploads/answersPics/{self.answerId}_answerPic.{suffix}'
+        return f'questions/uploads/answersPDF/{self.answerId}_answer.pdf'
 
     answerId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers", to_field='questionId')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, to_field='username')
-    body = models.TextField(default='')
-    answerPic = models.ImageField(upload_to=upload_location, default='', blank=True)
+    body = models.TextField(default='', blank=True)
+    answerPDF = models.FileField(upload_to=upload_location, default='', blank=True, validators=[FileExtensionValidator(['pdf'])])
     downvoters = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="downvotes", blank=True)
     upvoters = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="upvotes", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
