@@ -37,7 +37,7 @@
               >Contact Us
             </router-link>
           </li>
-          <li class="nav-item mx-1">
+          <li v-if="isAdmin" class="nav-item mx-1">
             <router-link 
               :to="{ name: 'question-editor' }" 
               class="btn btn-sm btn-danger"
@@ -56,8 +56,31 @@
 </template>
 
 <script>
+import {apiService} from "@/common/api.service";
+
 export default {
-  name: "NavbarComponent"
+  name: "NavbarComponent",
+  data () {
+    return {
+      userInfo : null,
+      isAdmin : false,
+    }
+  },
+  methods: {
+    getUserInfo() {
+      let endpoint = "/api/users/current/";
+      apiService(endpoint)
+        .then(data => {
+          this.userInfo = data;
+          if (this.userInfo["username"] === "admin") {
+            this.isAdmin = true;
+          }
+        })
+    }
+  },
+  created() {
+    this.getUserInfo()
+  }
 };
 </script>
 
