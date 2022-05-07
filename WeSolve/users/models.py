@@ -16,7 +16,7 @@ class Faculty(models.Model):
 class School(models.Model):
     schoolId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     schoolName = models.CharField(max_length=50, unique=True)
-    facultyName = models.ForeignKey(Faculty, default='Exact Science', on_delete=models.DO_NOTHING, to_field='facultyName')
+    facultyName = models.ForeignKey(Faculty, default='Exact Sciences', on_delete=models.CASCADE, to_field='facultyName')
 
     def __str__(self):
         return f'{self.schoolName}'
@@ -25,11 +25,23 @@ class School(models.Model):
         db_table = 'Schools'
 
 
+class Topic(models.Model):
+    topicId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    topicName = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return f'{self.topicName}'
+
+    class Meta:
+        db_table = 'Topics'
+
+
 class Course(models.Model):
     courseId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     courseName = models.CharField(max_length=50, unique=True)
     courseNumber = models.CharField(max_length=50, unique=True)
-    schoolName = models.ForeignKey(School, default='Computer Science', on_delete=models.DO_NOTHING, to_field='schoolName')
+    schoolName = models.ForeignKey(School, default='Computer Science', on_delete=models.CASCADE, to_field='schoolName')
+    topics = models.ManyToManyField(Topic, blank=True)
     # participants attribute is ManyToManyField relation to Users
 
     def __str__(self):
