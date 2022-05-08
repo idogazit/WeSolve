@@ -37,4 +37,10 @@ class SchoolListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = School
+        fields = ["schoolName"]
+
+class CourseListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Course
         fields = "__all__"
