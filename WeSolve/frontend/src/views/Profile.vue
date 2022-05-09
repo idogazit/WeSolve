@@ -48,14 +48,10 @@ export default {
       apiService(endpoint)
         .then(data => {
           this.userFullName = data["first_name"].concat(" ", data["last_name"]);
-            this.userFullName = "Slava Novgorodov";
           this.userEmail = data["email"];
-            this.userEmail = "slava@gmail.com";
           this.userRank= this.rankMap[data["rank"]];
           this.userPic = data["userPic"];
-            this.userPic = "https://slavanov.com/photos/photo.png"
           this.userIsTeacher = data["isTeacher"];
-            this.userIsTeacher = true;
           this.userCourses = data["courses"];
         })
     }
