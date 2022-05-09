@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from users.models import CustomUser
+from users.models import (CustomUser, Faculty, 
+                            School, Course)
 
 
 class UserDisplaySerializer(serializers.ModelSerializer):
@@ -26,3 +27,20 @@ class UserAdminDisplaySerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = "__all__"
 
+class FacultyListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Faculty
+        fields = "__all__"
+
+class SchoolListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = School
+        fields = ["schoolName"]
+
+class CourseListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Course
+        fields = "__all__"
