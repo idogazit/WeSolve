@@ -3,7 +3,7 @@
     <div class="container mt-2">
       <div class="my-4">
         <h2>User Profile</h2>
-        <img :src="userPic" @error="this.src='http://example.com/default.jpg'" alt="">
+        <img :src="userPic" alt="">
         <h3>{{ this.userFullName }}</h3>
         <div>
           <p class="user-details">{{ this.userEmail }}</p>
@@ -14,9 +14,12 @@
         <div v-else>
           <p class="user-details">&#127894; Rank: {{ this.userRank }} &#127894;</p>
         </div>
-        <div>
-          <p class="my-courses">My Courses:</p>
-        </div>
+        <ul>
+          <li><h4 class="my-courses">My Courses:</h4></li>
+          <li v-for="course in userCourses" :key="course">
+            &#127891; {{ course.replace("_", " - ") }}
+          </li>
+        </ul>
       </div>
     </div>
   </div>
@@ -50,7 +53,8 @@ export default {
           this.userFullName = data["first_name"].concat(" ", data["last_name"]);
           this.userEmail = data["email"];
           this.userRank= this.rankMap[data["rank"]];
-          this.userPic = data["userPic"];
+          const url = data["userPic"].replace("http://localhost:8000/api/users/current/users/uploads/userPics/", "");
+          this.userPic = require("../../../users/uploads/userPics/".concat(url));
           this.userIsTeacher = data["isTeacher"];
           this.userCourses = data["courses"];
         })
@@ -130,6 +134,10 @@ img {
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   font-size: 1.3em;
+}
+
+li {
+  list-style-type: none;
 }
 
 </style>
