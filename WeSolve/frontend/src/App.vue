@@ -29,7 +29,7 @@ export default {
   methods: {
     async setUserInfo() {
       // add the username of the logged in user to localStorage
-      const data = await apiService("/api/user/");
+      const data = await apiService("/api/users/current/");
       const requestUser = data["username"];
       window.localStorage.setItem("username", requestUser);
     },

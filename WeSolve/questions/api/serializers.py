@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from questions.models import Answer, Question
+from questions.models import Answer, Question, Exam, Label
 
 
 class AnswerSerializer(serializers.ModelSerializer):
@@ -47,3 +47,9 @@ class QuestionSerializer(serializers.ModelSerializer):
     def get_user_has_answered(self, instance):
         request = self.context.get("request")
         return instance.answers.filter(author=request.user).exists()
+
+class ExamSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Exam
+        fields = "__all__"

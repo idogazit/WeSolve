@@ -2,7 +2,8 @@ from django.urls import path
 from users.api.views import (CurrentUserAPIView, 
                              UserListAPIView,
                              FacultyListAPIView,
-                             SchoolListAPIView)
+                             SchoolListAPIView,
+                             CourseListAPIView)
 
 
 urlpatterns = [
@@ -13,6 +14,6 @@ urlpatterns = [
                                     'delete' : 'destroy'}), 
         name="current-user"),
     path("nav/faculties/", FacultyListAPIView.as_view(), name="faculty-list"),
-    path("nav/schools/", SchoolListAPIView.as_view(), name="school-list")
-
+    path("nav/schools/", SchoolListAPIView.as_view(), name="school-list"),
+    path("nav/courses/", CourseListAPIView.as_view(), name="course-list")
 ]

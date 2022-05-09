@@ -9,19 +9,20 @@ from users.api.serializers import (UserDisplaySerializer,
                                    UserAdminDisplaySerializer,
                                    FacultyListSerializer,
                                    SchoolListSerializer,
-                                   CourseListSerializer)
-from users.api.renderers import myRenderer
+                                   CourseListSerializer,)
+from users.api.renderers import SchoolRenderer, CourseRenderer, facultyRenderer
 
 
 class FacultyListAPIView(generics.ListAPIView):
     queryset = Faculty.objects.all()
     serializer_class = FacultyListSerializer
+    renderer_classes = [facultyRenderer]
 
 
 class SchoolListAPIView(generics.ListAPIView):
     serializer_class = SchoolListSerializer
     # queryset = School.objects.all()
-    renderer_classes = [myRenderer]
+    renderer_classes = [SchoolRenderer]
 
     def get_queryset(self):
         queryset = School.objects.all()
@@ -29,8 +30,7 @@ class SchoolListAPIView(generics.ListAPIView):
         assert faculty is not None , (
             'faculty argument missing'
         )
-        if faculty is not None:
-            queryset = queryset.filter(facultyName=faculty)
+        queryset = queryset.filter(facultyName=faculty)
         assert queryset , (
             '"%s" faculty dosent have any schools in our website' % faculty
         )
@@ -44,9 +44,11 @@ class SchoolListAPIView(generics.ListAPIView):
 
 class CourseListAPIView(generics.ListAPIView):
     serializer_class = CourseListSerializer
+    renderer_classes = [CourseRenderer]
 
     def get_queryset(self):
         queryset = Course.objects.all()
+        
         school = self.request.query_params.get("school")
         assert school is not None , (
             'school argument missing'
