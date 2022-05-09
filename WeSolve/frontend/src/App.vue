@@ -23,7 +23,7 @@ export default {
     return {
       crumbs: ['TAU'],
       level: ['university', 'faculty', 'school', 'course', 'year'],
-      links: links
+      links: []
     };
   },
   methods: {
@@ -34,18 +34,24 @@ export default {
       window.localStorage.setItem("username", requestUser);
     },
     loadUpTAU(){
-    let endpoint = "/api/nav/faculties/"
-    apiService(endpoint)
-        .then(data => {
-          this.links = data["results"]
-      })
+      let endpoint = "/api/nav/faculties/"
+      apiService(endpoint)
+          .then(data => {
+            this.links = data["results"]
+        })
     },
     selected(crumb, ci) {
       // TODO: need to call API to get previous setting by the crumb selected
       this.crumbs = this.crumbs.slice(0, ci + 1)
       //this.links = ['Computer Science', 'Chemistry', 'Physics']
       //console.log(crumb)
-      let endpoint = "/api/nav/" + this.level[this.crumbs.length+1]+"s/?"+ this.level[this.crumbs.length] + "=" + crumb;
+      let endpoint
+      if (this.crumbs.length == 1) {
+        endpoint = "/api/nav/faculties/"
+      } else {
+        endpoint = "/api/nav/" + this.level[this.crumbs.length]+"s/?"+ this.level[this.crumbs.length-1] + "=" + crumb;
+      }
+      console.log("this endpoint: " + endpoint)
       apiService(endpoint)
         .then(data => {
           this.links = data["results"]
