@@ -88,20 +88,18 @@ class QuestionViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
+class QuestionListAPIView(generics.ListAPIView):
+    serializer_class = QuestionSerializer
+
+    def get_queryset(self):
+        kwarg_exam = self.kwargs.get("exam")
+        return Question.objects.filter(examUniqueName=kwarg_exam)
+
+
 class examAPIView(generics.ListAPIView):
     serializer_class = ExamSerializer
     renderer_classes = [examRenderer]
 
     def get_queryset(self):
-        queryset = Exam.objects.all()
-        course = self.request.query_params.get("course")
-        assert course is not None , (
-            'course argument missing'
-        )
-        if course is not None:
-            queryset = queryset.filter(courseName=course)
-        assert queryset , (
-            '"%s" course dosent have any exams in our website' % course
-        )
-        
-        return queryset
+        kwarg_course = self.kwargs.get("course")
+        return Exam.objects.filter(courseName=kwarg_course)

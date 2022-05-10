@@ -14,6 +14,6 @@ urlpatterns = [
                                     'delete' : 'destroy'}), 
         name="current-user"),
     path("nav/faculties/", FacultyListAPIView.as_view(), name="faculty-list"),
-    path("nav/schools/", SchoolListAPIView.as_view(), name="school-list"),
-    path("nav/courses/", CourseListAPIView.as_view(), name="course-list")
+    path("nav/<str:faculty>/schools/", SchoolListAPIView.as_view(), name="school-list"),
+    path("nav/<str:school>/courses/", CourseListAPIView.as_view(), name="course-list")
 ]

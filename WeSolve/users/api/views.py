@@ -21,25 +21,12 @@ class FacultyListAPIView(generics.ListAPIView):
 
 class SchoolListAPIView(generics.ListAPIView):
     serializer_class = SchoolListSerializer
-    # queryset = School.objects.all()
     renderer_classes = [SchoolRenderer]
 
     def get_queryset(self):
-        queryset = School.objects.all()
-        faculty = self.request.query_params.get("faculty")
-        assert faculty is not None , (
-            'faculty argument missing'
-        )
-        queryset = queryset.filter(facultyName=faculty)
-        assert queryset , (
-            '"%s" faculty dosent have any schools in our website' % faculty
-        )
-        return queryset
+        kwarg_faculty = self.kwargs.get("faculty")
+        return School.objects.filter(facultyName=kwarg_faculty)
     
-    # def get(self, request, *args, **kwargs):
-    #     faculty = self.request.query_params.get("faculty")
-    #     print(faculty)
-    #     return super().get(request, *args, **kwargs)
     
 
 class CourseListAPIView(generics.ListAPIView):
@@ -47,18 +34,8 @@ class CourseListAPIView(generics.ListAPIView):
     renderer_classes = [CourseRenderer]
 
     def get_queryset(self):
-        queryset = Course.objects.all()
-        
-        school = self.request.query_params.get("school")
-        assert school is not None , (
-            'school argument missing'
-        )
-        if school is not None:
-            queryset = queryset.filter(schoolName=school)
-        assert queryset , (
-            '"%s" school dosent have any courses in our website' % school
-        )
-        return queryset
+        kwarg_school = self.kwargs.get("school")
+        return Course.objects.filter(schoolName=kwarg_school)
 
 
 
@@ -67,9 +44,6 @@ class UserListAPIView(generics.ListAPIView):
     serializer_class = UserAdminDisplaySerializer
     permission_classes = [permissions.IsAdminUser]
 
-# class CurrentUserAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     qureyset = CustomUser.objects.all()
-#     serializer_class = UserDisplaySerializer
 
 class CurrentUserAPIView(mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin,
@@ -82,9 +56,3 @@ class CurrentUserAPIView(mixins.RetrieveModelMixin,
     def get_object(self):
         return self.request.user
 
-# class CurrentUserAPIView(APIView):
-
-#     def get(self, request):
-#         serializer = UserDisplaySerializer(request.user)
-#         return Response(serializer.data)
-    
