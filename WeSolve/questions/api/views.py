@@ -6,8 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from questions.api.permissions import IsAuthorOrReadOnly
-from questions.api.serializers import AnswerSerializer, QuestionSerializer
-from questions.models import Answer, Question
+from questions.api.serializers import AnswerSerializer, QuestionSerializer, ExamSerializer
+from questions.models import Answer, Question, Exam
+from questions.api.renderers import examRenderer
 
 
 class AnswerCreateAPIView(generics.CreateAPIView):
@@ -86,4 +87,21 @@ class QuestionViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    
+
+class examAPIView(generics.ListAPIView):
+    serializer_class = ExamSerializer
+    renderer_classes = [examRenderer]
+
+    def get_queryset(self):
+        queryset = Exam.objects.all()
+        course = self.request.query_params.get("course")
+        assert course is not None , (
+            'course argument missing'
+        )
+        if course is not None:
+            queryset = queryset.filter(courseName=course)
+        assert queryset , (
+            '"%s" course dosent have any exams in our website' % course
+        )
+        
+        return queryset
