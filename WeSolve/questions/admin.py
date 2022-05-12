@@ -1,5 +1,5 @@
 from django.contrib import admin
-from questions.models import Answer, Question, Exam, LabelValue, Label, QuestionLabel
+from questions.models import Answer, Question, Exam, LabelValue, Label, QuestionLabel, QuestionTopic
 
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ["answerId", "question", "author", "body"]
@@ -14,3 +14,4 @@ admin.site.register(Exam)
 admin.site.register(LabelValue)
 admin.site.register(Label)
 admin.site.register(QuestionLabel)
+admin.site.register(QuestionTopic)

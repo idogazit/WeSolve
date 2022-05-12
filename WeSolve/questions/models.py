@@ -73,6 +73,19 @@ class QuestionLabel(models.Model):
         db_table = 'QuestionLabels'
 
 
+class QuestionTopic(models.Model):
+    questionTopicId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    questionId = models.ForeignKey(Question, on_delete=models.CASCADE, to_field='questionId')
+    labeledByUser = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, to_field='username')
+    topicName = models.ForeignKey(usersModels.Topic, on_delete=models.CASCADE, to_field='topicName')
+
+    def __str__(self):
+        return str(self.questionTopicId)
+
+    class Meta:
+        db_table = 'QuestionTopics'
+
+
 class Answer(models.Model):
 
     def upload_location(self, filename):
