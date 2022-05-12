@@ -22,7 +22,7 @@ class AnswerSerializer(serializers.ModelSerializer):
     
     def get_downvotes_count(self, instance):
         return instance.downvoters.count()
-
+    
     def get_user_has_voted(self, instance):
         request = self.context.get("request")
         has_upvoted = instance.upvoters.filter(pk=request.user.pk).exists()

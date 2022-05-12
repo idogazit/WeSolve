@@ -28,17 +28,18 @@ class AnswerCreateAPIView(generics.CreateAPIView):
         serializer.save(author=request_user, question=question)
 
 
-class AnswerLikeAPIView(APIView):
-    """Allow users to add/remove a like to/from an answer instance."""
+class AnswerUpvoteAPIView(APIView):
+    """Allow users to add/remove a upvotes to/from an answer instance."""
     serializer_class = AnswerSerializer
     permission_classes = [IsAuthenticated]
+    lookup_field = "answerId"
 
     def delete(self, request, pk):
-        """Remove request.user from the voters queryset of an answer instance."""
+        """Remove request.user from the upvoters queryset of an answer instance."""
         answer = get_object_or_404(Answer, pk=pk)
         user = request.user
 
-        answer.voters.remove(user)
+        answer.upvoters.remove(user)
         answer.save()
 
         serializer_context = {"request": request}
@@ -47,11 +48,44 @@ class AnswerLikeAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, pk):
-        """Add request.user to the voters queryset of an answer instance."""
+        """Add request.user to the upvoters queryset of an answer instance."""
         answer = get_object_or_404(Answer, pk=pk)
         user = request.user
 
-        answer.voters.add(user)
+        answer.upvoters.add(user)
+        answer.save()
+
+        serializer_context = {"request": request}
+        serializer = self.serializer_class(answer, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AnswerDownvoteAPIView(APIView):
+    """Allow users to add/remove a downvote to/from an answer instance."""
+    serializer_class = AnswerSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = "answerId"
+
+    def delete(self, request, pk):
+        """Remove request.user from the downvoters queryset of an answer instance."""
+        answer = get_object_or_404(Answer, pk=pk)
+        user = request.user
+
+        answer.downvoters.remove(user)
+        answer.save()
+
+        serializer_context = {"request": request}
+        serializer = self.serializer_class(answer, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk):
+        """Add request.user to the downvoters queryset of an answer instance."""
+        answer = get_object_or_404(Answer, pk=pk)
+        user = request.user
+
+        answer.downvoters.add(user)
         answer.save()
 
         serializer_context = {"request": request}
@@ -75,6 +109,8 @@ class AnswerRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
     permission_classes = [IsAuthenticated, IsAuthorOrReadOnly]
+    lookup_field = "answerId"
+
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
