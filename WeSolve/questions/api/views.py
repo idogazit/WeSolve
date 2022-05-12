@@ -40,6 +40,7 @@ class AnswerUpvoteAPIView(APIView):
         user = request.user
 
         answer.upvoters.remove(user)
+        answer.ranking -= 1
         answer.save()
 
         serializer_context = {"request": request}
@@ -53,6 +54,7 @@ class AnswerUpvoteAPIView(APIView):
         user = request.user
 
         answer.upvoters.add(user)
+        answer.ranking += 1
         answer.save()
 
         serializer_context = {"request": request}
@@ -73,6 +75,7 @@ class AnswerDownvoteAPIView(APIView):
         user = request.user
 
         answer.downvoters.remove(user)
+        answer.ranking += 1
         answer.save()
 
         serializer_context = {"request": request}
@@ -86,6 +89,7 @@ class AnswerDownvoteAPIView(APIView):
         user = request.user
 
         answer.downvoters.add(user)
+        answer.ranking -= 1
         answer.save()
 
         serializer_context = {"request": request}
@@ -101,7 +105,7 @@ class AnswerListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         kwarg_slug = self.kwargs.get("slug")
-        return Answer.objects.filter(question__slug=kwarg_slug).order_by("-created_at")
+        return Answer.objects.filter(question__slug=kwarg_slug).order_by("-ranking")
 
 
 class AnswerRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
