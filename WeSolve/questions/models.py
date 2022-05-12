@@ -98,6 +98,7 @@ class Answer(models.Model):
     answerPDF = models.FileField(upload_to=upload_location, default='', blank=True, validators=[FileExtensionValidator(['pdf'])])
     downvoters = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="downvotes", blank=True)
     upvoters = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="upvotes", blank=True)
+    ranking = models.IntegerField(blank=True, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
