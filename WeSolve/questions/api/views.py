@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from questions.api.permissions import IsAuthorOrReadOnly
-from questions.api.serializers import AnswerSerializer, QuestionSerializer, ExamSerializer
-from questions.models import Answer, Question, Exam
+from questions.api.serializers import AnswerSerializer, QuestionSerializer, ExamSerializer, LabelListSerializer
+from questions.models import Answer, Question, Exam, Label
 from questions.api.renderers import examRenderer
 
 
@@ -103,3 +103,10 @@ class examAPIView(generics.ListAPIView):
     def get_queryset(self):
         kwarg_course = self.kwargs.get("course")
         return Exam.objects.filter(courseName=kwarg_course)
+
+
+class LabelListAPIView(generics.ListAPIView):
+    """Provide the labels queryset"""
+    serializer_class = LabelListSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = Label.objects.all()

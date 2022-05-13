@@ -31,5 +31,9 @@ urlpatterns = [
      
      path("nav/<str:exam>/questions/",
           qv.QuestionListAPIView.as_view(),
-          name="exam-questions-list")
+          name="exam-questions-list"),
+
+     path("labels/",
+     qv.LabelListAPIView.as_view(),
+     name="labels-list")
 ]
