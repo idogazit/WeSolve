@@ -4,12 +4,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics, mixins, viewsets
 from rest_framework import permissions
-from users.models import CustomUser, Faculty, School, Course
+from users.models import CustomUser, Faculty, School, Course, Topic
 from users.api.serializers import (UserDisplaySerializer, 
                                    UserAdminDisplaySerializer,
                                    FacultyListSerializer,
                                    SchoolListSerializer,
-                                   CourseListSerializer,)
+                                   CourseListSerializer,
+                                   TopicListSerializer,)
 from users.api.renderers import SchoolRenderer, CourseRenderer, facultyRenderer
 
 
@@ -56,3 +57,9 @@ class CurrentUserAPIView(mixins.RetrieveModelMixin,
     def get_object(self):
         return self.request.user
 
+
+class TopicListAPIView(generics.ListAPIView):
+    """Provide the topics queryset"""
+    serializer_class = TopicListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Topic.objects.all()

@@ -60,8 +60,18 @@ class ExamSerializer(serializers.ModelSerializer):
         model = Exam
         fields = "__all__"
 
+
 class QuestionLabelSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = QuestionLabel
         fields = "__all__"
+
+
+class LabelListSerializer(serializers.ModelSerializer):
+    possibleValues = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = Label
+        fields = "__all__"
+
