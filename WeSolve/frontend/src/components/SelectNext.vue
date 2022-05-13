@@ -1,19 +1,24 @@
 <template>
     <div class="container border-0 align-items-center d-flex justify-content-center">
-        <div class="jumbotron">
+        <div v-if="links.length > 0" class="jumbotron">
             <h2>
-            Please choose a {{level}}:
+            Please choose {{level}}:
             </h2>
             <div class="btn-group-vertical d-flex justify-content-center">
                 <button 
                     class="btn btn-secondary" 
-                    @click="selectedLink(link)"
+                    @click="selectedLink(link, linkIndex)"
                     v-for="(link, linkIndex) in links"
                     :key="linkIndex" 
                 >
                     {{link}}
                 </button>
             </div>
+        </div>
+        <div v-else class="jumbotron">
+            <h3>
+            No {{level}}s to select, please go back!
+            </h3>
         </div>
     </div>
 </template>
@@ -31,8 +36,8 @@ export default {
         }
     },
     methods: {
-        selectedLink(link){
-            this.$emit('selectedLink', link);
+        selectedLink(link, linkIndex){
+            this.$emit('selectedLink', link, linkIndex);
         }
     }
 }
