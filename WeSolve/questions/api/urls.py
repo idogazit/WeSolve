@@ -16,6 +16,10 @@ urlpatterns = [
     path("questions/<slug:slug>/answer/", 
          qv.AnswerCreateAPIView.as_view(),
          name="answer-create"),
+     
+     path("questions/<slug:slug>/labels/", 
+          qv.QuestionLabelListAPIVIew.as_view(),
+          name="question-label-list"),
 
     path("answers/<str:answerId>/", 
          qv.AnswerRUDAPIView.as_view(),
@@ -36,4 +40,5 @@ urlpatterns = [
      path("nav/<str:exam>/questions/",
           qv.QuestionListAPIView.as_view(),
           name="exam-questions-list")
+
 ]

@@ -6,8 +6,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from questions.api.permissions import IsAuthorOrReadOnly
-from questions.api.serializers import AnswerSerializer, QuestionSerializer, ExamSerializer
-from questions.models import Answer, Question, Exam
+from questions.api.serializers import (AnswerSerializer,
+                                       QuestionSerializer, 
+                                       ExamSerializer, 
+                                       QuestionLabelSerializer)
+from questions.models import Answer, Question, Exam, QuestionLabel
 from questions.api.renderers import examRenderer
 
 
@@ -134,6 +137,14 @@ class QuestionListAPIView(generics.ListAPIView):
     def get_queryset(self):
         kwarg_exam = self.kwargs.get("exam")
         return Question.objects.filter(examUniqueName=kwarg_exam)
+
+
+class QuestionLabelListAPIVIew(generics.ListCreateAPIView):
+    serializer_class = QuestionLabelSerializer
+
+    def get_queryset(self):
+        kwarg_question = self.kwargs.get("question")
+        return QuestionLabel.objects.filter(questionId=kwarg_question)
 
 
 class examAPIView(generics.ListAPIView):
