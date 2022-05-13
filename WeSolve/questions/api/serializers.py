@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from questions.models import Answer, Question, Exam, Label
+from questions.models import Answer, Question, Exam, Label, QuestionTopic
 
 
 class AnswerSerializer(serializers.ModelSerializer):
@@ -65,4 +65,10 @@ class LabelListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Label
+        fields = "__all__"
+
+class QuestionTopicListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = QuestionTopic
         fields = "__all__"

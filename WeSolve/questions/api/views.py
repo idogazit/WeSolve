@@ -6,10 +6,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from questions.api.permissions import IsAuthorOrReadOnly
-from questions.api.serializers import AnswerSerializer, QuestionSerializer, ExamSerializer, LabelListSerializer
-from questions.models import Answer, Question, Exam, Label
+from questions.api.serializers import AnswerSerializer, QuestionSerializer, ExamSerializer, LabelListSerializer, QuestionTopicListSerializer
+from questions.models import Answer, Question, Exam, Label, QuestionTopic
 from questions.api.renderers import examRenderer
 
+from users.models import Topic
 
 class AnswerCreateAPIView(generics.CreateAPIView):
     """Allow users to answer a question instance if they haven't already."""
@@ -110,3 +111,31 @@ class LabelListAPIView(generics.ListAPIView):
     serializer_class = LabelListSerializer
     permission_classes = [IsAuthenticated]
     queryset = Label.objects.all()
+
+
+class QuestionTopicAPIView(generics.ListCreateAPIView):
+    """
+    Concrete view for listing a queryset or creating a model instance.
+    """
+    serializer_class = QuestionTopicListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """..."""
+        kwarg_question = self.kwargs.get("questionId")
+        return QuestionTopic.objects.filter(questionId=kwarg_question)
+
+    def post(self, request, questionId):
+        """Add request.user to the voters queryset of an answer instance."""
+        user = request.user
+        question = get_object_or_404(Question, questionId=questionId)
+        topic = get_object_or_404(Topic, topicName=request.data.get('topicName'))
+
+        if QuestionTopic.objects.filter(questionId=question, labeledByUser=user, topicName=topic).exists():
+            raise ValidationError("You have already gave this topic to this Question!")
+
+        topicQuest = QuestionTopic.objects.create(questionId=question, labeledByUser=user, topicName=topic)
+
+        serializer_context = {"request": request}
+        serializer = self.serializer_class(topicQuest, context=serializer_context)
+        return Response(serializer.data, status=status.HTTP_200_OK)
