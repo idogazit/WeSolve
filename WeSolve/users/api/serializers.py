@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users.models import (CustomUser, Faculty, 
-                            School, Course)
+                            School, Course, Topic)
 
 
 class UserDisplaySerializer(serializers.ModelSerializer):
@@ -43,4 +43,10 @@ class CourseListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
+        fields = "__all__"
+
+class TopicListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Topic
         fields = "__all__"
