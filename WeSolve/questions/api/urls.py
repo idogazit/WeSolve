@@ -18,7 +18,7 @@ urlpatterns = [
          name="answer-create"),
      
      path("questions/<str:question>/labels/", 
-          qv.QuestionLabelListAPIVIew.as_view(),
+          qv.QuestionLabelListAPIView.as_view(),
           name="question-label-list"),
 
     path("answers/<str:answerId>/", 

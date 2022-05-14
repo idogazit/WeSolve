@@ -75,12 +75,7 @@ class LabelListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Label
         fields = "__all__"
-
-class QuestionLabelListSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = QuestionLabel
-        fields = "__all__"
+        
 
 class QuestionTopicListSerializer(serializers.ModelSerializer):
 
