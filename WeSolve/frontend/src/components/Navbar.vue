@@ -90,8 +90,9 @@ export default {
 }
 
 .navbar-brand {
+  font-family: 'Aladin', cursive;
   font-weight: bold;
-  font-size: 130%;
+  font-size: 150%;
 }
 
 .navbar-brand:hover {

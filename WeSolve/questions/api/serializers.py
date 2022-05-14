@@ -2,6 +2,7 @@ from rest_framework import serializers
 from questions.models import Answer, Question, Exam, Label, QuestionLabel, QuestionTopic
 
 
+
 class AnswerSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
     created_at = serializers.SerializerMethodField()
@@ -22,7 +23,7 @@ class AnswerSerializer(serializers.ModelSerializer):
     
     def get_downvotes_count(self, instance):
         return instance.downvoters.count()
-
+    
     def get_user_has_voted(self, instance):
         request = self.context.get("request")
         has_upvoted = instance.upvoters.filter(pk=request.user.pk).exists()
@@ -60,6 +61,14 @@ class ExamSerializer(serializers.ModelSerializer):
         model = Exam
         fields = "__all__"
 
+
+class QuestionLabelSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = QuestionLabel
+        fields = "__all__"
+
+
 class LabelListSerializer(serializers.ModelSerializer):
     possibleValues = serializers.StringRelatedField(many=True)
 
@@ -67,8 +76,10 @@ class LabelListSerializer(serializers.ModelSerializer):
         model = Label
         fields = "__all__"
 
+
 class QuestionTopicListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QuestionTopic
         fields = "__all__"
+

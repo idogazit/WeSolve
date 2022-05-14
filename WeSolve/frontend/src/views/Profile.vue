@@ -53,7 +53,7 @@ export default {
           this.userFullName = data["first_name"].concat(" ", data["last_name"]);
           this.userEmail = data["email"];
           this.userRank= this.rankMap[data["rank"]];
-          const url = data["userPic"].replace("http://localhost:8000/api/users/current/users/uploads/userPics/", "");
+          const url = data["userPic"].replace("http://localhost:8000/api/users/current/uploads/userPics/", "");
           this.userPic = require("../../../users/uploads/userPics/".concat(url));
           this.userIsTeacher = data["isTeacher"];
           this.userCourses = data["courses"];
