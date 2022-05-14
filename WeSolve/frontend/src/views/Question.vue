@@ -96,7 +96,6 @@ export default {
       userHasAnswered: false,
       showForm: false,
       requestUser: null,
-      questionPDF: "",
     }
   },
   computed: {

@@ -53,7 +53,6 @@ export default {
       upvotesCounter: this.answer.likes_count, // TODO: needs to be replaced with upvotes_count
       userDownvotedAnswer: this.answer.user_has_downvoted,
       downvotesCounter: this.answer.downvotes_count,
-      answerPDF: "",
     }
   },
   computed: {
