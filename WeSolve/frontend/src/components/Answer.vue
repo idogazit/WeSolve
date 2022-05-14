@@ -4,40 +4,7 @@
       <strong>{{ answer.author }}</strong> &#8901; {{ answer.created_at }}
     </p>
     <p>{{ answer.body }}</p>
-    <div v-if="isAnswerAuthor">
-      <router-link
-        :to="{ name: 'answer-editor', params: { id: answer.id } }"
-        class="btn btn-sm btn-outline-secondary mr-1"
-        >Edit
-      </router-link>
-      <button
-        class="btn btn-sm btn-outline-danger"
-        @click="triggerDeleteAnswer"
-        >Delete
-      </button>
-      <br/>
-      <button
-        class="btn btn-sm"
-        @click="toggleUpvote"
-        :class="{
-          'btn-success': userUpvotedAnswer,
-          'btn-outline-success': !userUpvotedAnswer
-          }"
-        disabled
-        ><strong>Upvote [{{ upvotesCounter }}]</strong>
-      </button>
-      <button
-        class="btn btn-sm"
-        @click="toggleUpvote"
-        :class="{
-          'btn-danger': userUpvotedAnswer,
-          'btn-outline-danger': !userUpvotedAnswer
-          }"
-        disabled
-        ><strong>Downvote [{{ upvotesCounter }}]</strong>
-      </button>
-    </div>
-    <div v-else>      
+    <div>
       <button
         class="btn btn-sm"
         @click="toggleUpvote"
@@ -82,7 +49,7 @@ export default {
       userUpvotedAnswer: this.answer.user_has_voted, // TODO: needs to be replaced with user_has_upvoted
       upvotesCounter: this.answer.likes_count, // TODO: needs to be replaced with upvotes_count
       userDownvotedAnswer: this.answer.user_has_downvoted,
-      downvotesCounter: this.answer.downvotes_count
+      downvotesCounter: this.answer.downvotes_count,
     }
   },
   computed: {
@@ -126,10 +93,12 @@ export default {
       let endpoint = `/api/answers/${ this.answer.id }/like/`;
       apiService(endpoint, "DELETE")
     },
-    triggerDeleteAnswer() {
-      // emit an event to delete an answer instance
-      this.$emit("delete-answer", this.answer)
-    }
+    getAnswers() {
+
+    },
+    created() {
+      this.getAnswers();
+    },
   }
 }
 </script>

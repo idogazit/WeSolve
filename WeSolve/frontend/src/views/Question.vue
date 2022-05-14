@@ -10,6 +10,9 @@
         <span class="author-name">{{ question.author }}</span>
       </p>
       <p>{{ question.created_at }}</p>
+      <p>
+          <iframe :src="questionPDF"></iframe>
+      </p>
       <hr>
       <div v-if="userHasAnswered">
         <p class="answer-added">You've written an answer!</p>
@@ -92,7 +95,8 @@ export default {
       error: null,
       userHasAnswered: false,
       showForm: false,
-      requestUser: null
+      requestUser: null,
+      questionPDF: "",
     }
   },
   computed: {
@@ -118,10 +122,12 @@ export default {
           if (data) {
             this.question = data;
             this.userHasAnswered = data.user_has_answered;
-            this.setPageTitle(data.content)
+            this.setPageTitle(data.content);
+            const pdfFileName = this.question["questionPDF"].replace("http://localhost:8000/api/questions/".concat(this.question.slug).concat("/questions/uploads/questionsPDF/"), "");
+            this.questionPDF = "../../../questions/uploads/questionsPDF/".concat(pdfFileName);
           } else {
             this.question = null;
-            this.setPageTitle("404 - Page Not Found")
+            this.setPageTitle("404 - Page Not Found");
           }
 
         })
