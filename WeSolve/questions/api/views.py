@@ -9,11 +9,14 @@ from questions.api.permissions import IsAuthorOrReadOnly
 from questions.api.serializers import (AnswerSerializer,
                                        QuestionSerializer, 
                                        ExamSerializer, 
-                                       QuestionLabelSerializer,
-                                       LabelListSerializer)
-from questions.models import Answer, Question, Exam, QuestionLabel, Label
+                                       LabelListSerializer,
+                                       QuestionTopicListSerializer)
+from questions.models import Answer, Question, Exam, QuestionLabel, Label, QuestionTopic
 from questions.api.renderers import examRenderer
 
+from django.db.models import Count
+
+from users.models import Topic
 
 class AnswerCreateAPIView(generics.CreateAPIView):
     """Allow users to answer a question instance if they haven't already."""
@@ -162,3 +165,41 @@ class LabelListAPIView(generics.ListAPIView):
     serializer_class = LabelListSerializer
     permission_classes = [IsAuthenticated]
     queryset = Label.objects.all()
+
+
+class QuestionTopicAPIView(generics.ListCreateAPIView):
+    """
+    Concrete view for listing a topicQuestions or creating a topicQuestion instance.
+    """
+    serializer_class = QuestionTopicListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """List all given topics records for a question"""
+        kwarg_question = self.kwargs.get("questionId")
+        return QuestionTopic.objects.filter(questionId=kwarg_question)
+    
+
+    """
+    def get_queryset(self):
+        ...
+        topicsGiven = QuestionTopic.objects.filter(questionId=self.kwargs.get("questionId"))
+        aggregated_topics = topicsGiven.all().values('topicName').annotate(total=Count('topicName')).order_by('total')
+        return aggregated_topics.filter(total__gte=1)[:3]
+    """  
+
+    def post(self, request, questionId):
+        """Add the request.user's given topic for a question.
+          Create atopicQuestions instance."""
+        user = request.user
+        question = get_object_or_404(Question, questionId=questionId)
+        topic = get_object_or_404(Topic, topicName=request.data.get('topicName'))
+
+        if QuestionTopic.objects.filter(questionId=question, labeledByUser=user, topicName=topic).exists():
+            raise ValidationError("You have already gave this topic to this Question!")
+
+        topicQuest = QuestionTopic.objects.create(questionId=question, labeledByUser=user, topicName=topic)
+
+        serializer_context = {"request": request}
+        serializer = self.serializer_class(topicQuest, context=serializer_context)
+        return Response(serializer.data, status=status.HTTP_200_OK)

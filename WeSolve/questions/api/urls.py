@@ -43,5 +43,9 @@ urlpatterns = [
 
      path("labels/",
           qv.LabelListAPIView.as_view(),
-          name="labels-list")
+          name="labels-list"),
+
+     path("questions/<str:questionId>/topics/",
+          qv.QuestionTopicAPIView.as_view(),
+          name="topics-get-create")
 ]
