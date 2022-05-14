@@ -11,7 +11,7 @@
       </p>
       <p>{{ question.created_at }}</p>
       <p>
-        <embed :src="questionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="70%">
+        <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="80%">
       </p>
       <hr>
       <div v-if="userHasAnswered">
@@ -103,7 +103,11 @@ export default {
     isQuestionAuthor() {
       // return true if the logged in user is also the author of the question instance
       return this.question.author === this.requestUser;
-    }
+    },
+    getQuestionPDF() {
+      const url = this.question["questionPDF"].replace("http://localhost:8000/api/questions/".concat(this.question["slug"]).concat("/questions/uploads/questionsPDF/"), "");
+      return "../../../questions/uploads/questionsPDF/".concat(url).concat("/");
+    },
   },
   methods: {
     setPageTitle(title) {
@@ -123,8 +127,6 @@ export default {
             this.question = data;
             this.userHasAnswered = data.user_has_answered;
             this.setPageTitle(data.content)
-            const url = this.question["questionPDF"].replace("http://localhost:8000/api/questions/".concat(this.question["slug"]).concat("/questions/uploads/questionsPDF/"), "");
-            this.questionPDF = "../../../questions/uploads/questionsPDF/".concat(url).concat("/");
           } else {
             this.question = null;
             this.setPageTitle("404 - Page Not Found")

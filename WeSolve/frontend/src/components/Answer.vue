@@ -5,7 +5,7 @@
     </p>
     <p>{{ answer.body }}</p>
     <p>
-      <embed :src="answerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="70%">
+      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="1000px" width="80%">
     </p>
     <div>
       <button
@@ -60,7 +60,11 @@ export default {
     isAnswerAuthor() {
       // return true if the logged in user is also the author of the answer instance
       return this.answer.author === this.requestUser;
-    }
+    },
+    getAnswerPDF() {
+      const url = this.answer["answerPDF"].replace("http://localhost:8000/api/questions/".concat(this.answer["question_slug"]).concat("/answers/questions/uploads/answersPDF/"), "");
+      return "../../../questions/uploads/answersPDF/".concat(url).concat("/");
+    },
   },
   methods: {
     toggleUpvote() {
@@ -100,11 +104,6 @@ export default {
     triggerDeleteAnswer() {
       // emit an event to delete an answer instance
       this.$emit("delete-answer", this.answer)
-    },
-    created() {
-      const url = this.answer["answerPDF"].replace("http://localhost:8000/api/questions/".concat(this.answer["question_slug"]).concat("/answers/questions/uploads/answersPDF/"), "");
-      console.log(url);
-      this.answerPDF = "../../../questions/uploads/answersPDF/".concat(url).concat("/");
     },
   }
 }
