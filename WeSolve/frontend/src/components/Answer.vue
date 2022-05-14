@@ -4,40 +4,10 @@
       <strong>{{ answer.author }}</strong> &#8901; {{ answer.created_at }}
     </p>
     <p>{{ answer.body }}</p>
-    <div v-if="isAnswerAuthor">
-      <router-link
-        :to="{ name: 'answer-editor', params: { id: answer.id } }"
-        class="btn btn-sm btn-outline-secondary mr-1"
-        >Edit
-      </router-link>
-      <button
-        class="btn btn-sm btn-outline-danger"
-        @click="triggerDeleteAnswer"
-        >Delete
-      </button>
-      <br/>
-      <button
-        class="btn btn-sm"
-        @click="toggleUpvote"
-        :class="{
-          'btn-success': userUpvotedAnswer,
-          'btn-outline-success': !userUpvotedAnswer
-          }"
-        disabled
-        ><strong>Upvote [{{ upvotesCounter }}]</strong>
-      </button>
-      <button
-        class="btn btn-sm"
-        @click="toggleUpvote"
-        :class="{
-          'btn-danger': userUpvotedAnswer,
-          'btn-outline-danger': !userUpvotedAnswer
-          }"
-        disabled
-        ><strong>Downvote [{{ upvotesCounter }}]</strong>
-      </button>
-    </div>
-    <div v-else>      
+    <p>
+      <embed :src="answerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="70%">
+    </p>
+    <div>
       <button
         class="btn btn-sm"
         @click="toggleUpvote"
@@ -82,7 +52,8 @@ export default {
       userUpvotedAnswer: this.answer.user_has_voted, // TODO: needs to be replaced with user_has_upvoted
       upvotesCounter: this.answer.likes_count, // TODO: needs to be replaced with upvotes_count
       userDownvotedAnswer: this.answer.user_has_downvoted,
-      downvotesCounter: this.answer.downvotes_count
+      downvotesCounter: this.answer.downvotes_count,
+      answerPDF: "",
     }
   },
   computed: {
@@ -129,7 +100,12 @@ export default {
     triggerDeleteAnswer() {
       // emit an event to delete an answer instance
       this.$emit("delete-answer", this.answer)
-    }
+    },
+    created() {
+      const url = this.answer["answerPDF"].replace("http://localhost:8000/api/questions/".concat(this.answer["question_slug"]).concat("/answers/questions/uploads/answersPDF/"), "");
+      console.log(url);
+      this.answerPDF = "../../../questions/uploads/answersPDF/".concat(url).concat("/");
+    },
   }
 }
 </script>

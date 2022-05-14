@@ -10,6 +10,9 @@
         <span class="author-name">{{ question.author }}</span>
       </p>
       <p>{{ question.created_at }}</p>
+      <p>
+        <embed :src="questionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="70%">
+      </p>
       <hr>
       <div v-if="userHasAnswered">
         <p class="answer-added">You've written an answer!</p>
@@ -92,7 +95,8 @@ export default {
       error: null,
       userHasAnswered: false,
       showForm: false,
-      requestUser: null
+      requestUser: null,
+      questionPDF: "",
     }
   },
   computed: {
@@ -119,6 +123,8 @@ export default {
             this.question = data;
             this.userHasAnswered = data.user_has_answered;
             this.setPageTitle(data.content)
+            const url = this.question["questionPDF"].replace("http://localhost:8000/api/questions/".concat(this.question["slug"]).concat("/questions/uploads/questionsPDF/"), "");
+            this.questionPDF = "../../../questions/uploads/questionsPDF/".concat(url).concat("/");
           } else {
             this.question = null;
             this.setPageTitle("404 - Page Not Found")
