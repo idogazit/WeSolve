@@ -6,8 +6,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from questions.api.permissions import IsAuthorOrReadOnly
-from questions.api.serializers import AnswerSerializer, QuestionSerializer, ExamSerializer, LabelListSerializer, QuestionTopicListSerializer
-from questions.models import Answer, Question, Exam, Label, QuestionTopic
+from questions.api.serializers import (AnswerSerializer,
+                                       QuestionSerializer, 
+                                       ExamSerializer, 
+                                       LabelListSerializer,
+                                       QuestionTopicListSerializer)
+from questions.models import Answer, Question, Exam, QuestionLabel, Label, QuestionTopic
 from questions.api.renderers import examRenderer
 
 from django.db.models import Count
@@ -117,13 +121,13 @@ class LabelListAPIView(generics.ListAPIView):
 
 class QuestionTopicAPIView(generics.ListCreateAPIView):
     """
-    Concrete view for listing a queryset or creating a model instance.
+    Concrete view for listing a topicQuestions or creating a topicQuestion instance.
     """
     serializer_class = QuestionTopicListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """..."""
+        """List all given topics records for a question"""
         kwarg_question = self.kwargs.get("questionId")
         return QuestionTopic.objects.filter(questionId=kwarg_question)
     
@@ -137,7 +141,8 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
     """  
 
     def post(self, request, questionId):
-        """Add request.user to the voters queryset of an answer instance."""
+        """Add the request.user's given topic for a question.
+          Create atopicQuestions instance."""
         user = request.user
         question = get_object_or_404(Question, questionId=questionId)
         topic = get_object_or_404(Topic, topicName=request.data.get('topicName'))

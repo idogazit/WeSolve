@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from questions.models import Answer, Question, Exam, Label, QuestionTopic
+from questions.models import Answer, Question, Exam, Label, QuestionLabel, QuestionTopic
 
 
 class AnswerSerializer(serializers.ModelSerializer):
