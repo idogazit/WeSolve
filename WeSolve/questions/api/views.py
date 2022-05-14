@@ -10,6 +10,7 @@ from questions.api.serializers import (AnswerSerializer,
                                        QuestionSerializer, 
                                        ExamSerializer, 
                                        LabelListSerializer,
+                                       QuestionLabelListSerializer,
                                        QuestionTopicListSerializer)
 from questions.models import Answer, Question, Exam, QuestionLabel, Label, QuestionTopic
 from questions.api.renderers import examRenderer
@@ -144,7 +145,7 @@ class QuestionListAPIView(generics.ListAPIView):
 
 
 class QuestionLabelListAPIVIew(generics.ListCreateAPIView):
-    serializer_class = QuestionLabelSerializer
+    serializer_class = QuestionLabelListSerializer
 
     def get_queryset(self):
         kwarg_question = self.kwargs.get("question")
