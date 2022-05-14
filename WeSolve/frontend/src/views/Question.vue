@@ -31,6 +31,9 @@
             ></textarea>
           </div>
           <div class="card-footer px-3">
+            <input type="file" name="upload-pdf" accept="application/pdf" @change="uploadFile" ref="ansPDF"/>
+          </div>
+          <div class="card-footer px-3">
             <button type="submit" class="btn btn-sm btn-success">Submit Your Answer</button>
           </div>
         </form>
@@ -96,6 +99,7 @@ export default {
       userHasAnswered: false,
       showForm: false,
       requestUser: null,
+      answerData: {},
     }
   },
   computed: {
@@ -155,7 +159,8 @@ export default {
       // Tell the REST API to create a new answer for this question based on the user input, then update some data properties
       if (this.newAnswerBody) {
         let endpoint = `/api/questions/${this.slug}/answer/`;
-        apiService(endpoint, "POST", { body: this.newAnswerBody })
+        this.answerData["body"] = this.newAnswerBody;
+        apiService(endpoint, "POST", this.answerData)
           .then(data => {
             this.answers.unshift(data)
           })
@@ -168,6 +173,9 @@ export default {
       } else {
         this.error = "You can't send an empty answer!";
       }
+    },
+    uploadFile() {
+      this.answerData["answerPDF"] = this.$refs.ansPDF.files[0];
     },
     async deleteAnswer(answer) {
       // delete a given answer from the answers array and make a delete request to the REST API
