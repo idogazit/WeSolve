@@ -10,6 +10,8 @@ from questions.api.serializers import AnswerSerializer, QuestionSerializer, Exam
 from questions.models import Answer, Question, Exam, Label, QuestionTopic
 from questions.api.renderers import examRenderer
 
+from django.db.models import Count
+
 from users.models import Topic
 
 class AnswerCreateAPIView(generics.CreateAPIView):
@@ -124,6 +126,15 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
         """..."""
         kwarg_question = self.kwargs.get("questionId")
         return QuestionTopic.objects.filter(questionId=kwarg_question)
+    
+
+    """
+    def get_queryset(self):
+        ...
+        topicsGiven = QuestionTopic.objects.filter(questionId=self.kwargs.get("questionId"))
+        aggregated_topics = topicsGiven.all().values('topicName').annotate(total=Count('topicName')).order_by('total')
+        return aggregated_topics.filter(total__gte=1)[:3]
+    """  
 
     def post(self, request, questionId):
         """Add request.user to the voters queryset of an answer instance."""

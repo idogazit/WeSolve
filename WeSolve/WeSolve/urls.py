@@ -20,12 +20,15 @@ from django_registration.backends.one_step.views import RegistrationView
 
 from core.views import IndexTemplateView
 from users.forms import CustomUserForm
+from . import views as myViews
 
 
 # https://django-registration.readthedocs.io/en/3.0/activation-workflow.html
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    re_path(r'^questions/uploads/(?P<path>([^/]+/)*)$', myViews.ReturnPDF.as_view(), name="pdf-response"),
 
     path("accounts/register/",
          RegistrationView.as_view(
