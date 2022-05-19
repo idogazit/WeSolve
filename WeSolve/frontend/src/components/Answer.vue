@@ -61,8 +61,8 @@ export default {
       return this.answer.author === this.requestUser;
     },
     getAnswerPDF() {
-      const url = this.answer["answerPDF"].replace("http://localhost:8000/api/questions/".concat(this.answer["question_slug"]).concat("/answers/questions/uploads/answersPDF/"), "");
-      return "../../../questions/uploads/answersPDF/".concat(url).concat("/");
+      const pdf_name = this.answer["answerPDF"].split('/')[(this.answer["answerPDF"].split('/')).length - 1]
+      return "../../../questions/uploads/answersPDF/".concat(pdf_name).concat("/");
     },
   },
   methods: {
