@@ -157,6 +157,7 @@ class QuestionListAPIView(generics.ListAPIView):
 class QuestionLabelListAPIView(generics.ListCreateAPIView):
     serializer_class = QuestionLabelSerializer
     output_label_user = CustomUser.objects.get(username="admin")
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         kwarg_question = self.kwargs.get("question")
@@ -190,7 +191,7 @@ class QuestionLabelListAPIView(generics.ListCreateAPIView):
     
     def getAverageNumericLabel(self, queryset):
         avg = 0
-        count = len(queryset)
+        count = queryset.count()
         if count == 0:
             return None # may need to change
         for user_rank in queryset:
@@ -205,7 +206,7 @@ class QuestionLabelListAPIView(generics.ListCreateAPIView):
     
     def getMaxOccurenceLabel(self, queryset):
         labels = {}
-        count = len(queryset)
+        count = queryset.count()
         if count == 0:
             return None # may need to change
         for user_label in queryset:
@@ -250,7 +251,7 @@ class examAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         kwarg_course = self.kwargs.get("course")
-        return Exam.objects.filter(courseName=kwarg_course)
+        return Exam.objects.filter(courseName=kwarg_course).defer("CourseName")
 
 
 class LabelListAPIView(generics.ListAPIView):
