@@ -4,9 +4,9 @@
       <strong>{{ answer.author }}</strong> &#8901; {{ answer.created_at }}
     </p>
     <p>{{ answer.body }}</p>
-    <p>
-      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="1000px" width="80%">
-    </p>
+<!--    <p>-->
+<!--      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="1000px" width="80%">-->
+<!--    </p>-->
     <div>
       <button
         class="btn btn-sm"
@@ -61,8 +61,8 @@ export default {
       return this.answer.author === this.requestUser;
     },
     getAnswerPDF() {
-      const url = this.answer["answerPDF"].replace("http://localhost:8000/api/questions/".concat(this.answer["question_slug"]).concat("/answers/questions/uploads/answersPDF/"), "");
-      return "../../../questions/uploads/answersPDF/".concat(url).concat("/");
+      const pdf_name = this.answer["answerPDF"].split('/')[(this.answer["answerPDF"].split('/')).length - 1]
+      return "../../../questions/uploads/answersPDF/".concat(pdf_name).concat("/");
     },
   },
   methods: {

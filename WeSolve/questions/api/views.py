@@ -14,12 +14,11 @@ from questions.api.serializers import (AnswerSerializer,
                                        QuestionLabelSerializer)
 from questions.models import Answer, Question, Exam, QuestionLabel, Label, QuestionTopic
 from questions.api.renderers import examRenderer
-import uuid
-from django.db.models import Count
 from users.models import CustomUser
 from users.models import Topic
 
 from itertools import chain
+from collections import Counter
 
 
 class AnswerCreateAPIView(generics.CreateAPIView):
@@ -267,21 +266,38 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
     """
     serializer_class = QuestionTopicListSerializer
     permission_classes = [IsAuthenticated]
+    output_label_user = CustomUser.objects.get(username="admin")
+
 
     def get_queryset(self):
         """List all given topics records for a question"""
         kwarg_question = self.kwargs.get("questionId")
-        return QuestionTopic.objects.filter(questionId=kwarg_question)
+        queryset = QuestionTopic.objects.filter(questionId=kwarg_question)
+        new_queryset = self.getThreeMaxOccurenceTopics(queryset)
+        none_qs = QuestionLabel.objects.none()
+        qs = list(chain(none_qs, new_queryset))
+        return qs
+
+    def getThreeMaxOccurenceTopics(self, queryset):
+        labels = {}
+        count = len(queryset)
+        if count == 0:
+            return None # may need to change
+        for user_topic in queryset:
+            l = user_topic.topicName
+            if l in labels:
+                labels[l] += 1
+            else:
+                labels[l] = 1
+        final_topics = [k for k,v in Counter(labels).most_common(3)]
+        new_queryset = []
+        for topic in final_topics:
+            ans = QuestionTopic(questionId=queryset[0].questionId,
+                                labeledByUser=self.output_label_user,
+                                topicName=topic)
+            new_queryset.append(ans)
+        return new_queryset  
     
-
-    """
-    def get_queryset(self):
-        ...
-        topicsGiven = QuestionTopic.objects.filter(questionId=self.kwargs.get("questionId"))
-        aggregated_topics = topicsGiven.all().values('topicName').annotate(total=Count('topicName')).order_by('total')
-        return aggregated_topics.filter(total__gte=1)[:3]
-    """  
-
     def post(self, request, questionId):
         """Add the request.user's given topic for a question.
           Create atopicQuestions instance."""
