@@ -14,12 +14,12 @@
         <div v-else>
           <p class="user-details">&#127894; Rank: {{ this.userRank }} &#127894;</p>
         </div>
-        <ul>
+        <!--<ul>
           <li><h4 class="my-courses">My Courses:</h4></li>
           <li v-for="course in userCourses" :key="course">
             &#127891; {{ course.replace("_", " - ") }}
           </li>
-        </ul>
+        </ul>-->
       </div>
     </div>
   </div>
