@@ -53,7 +53,7 @@ export default {
           this.userFullName = data["first_name"].concat(" ", data["last_name"]);
           this.userEmail = data["email"];
           this.userRank= this.rankMap[data["rank"]];
-          const pic_name = data["userPic"].split('/')[data["userPic"].split('/').length - 1]
+          var pic_name = data["userPic"].split('/')[data["userPic"].split('/').length - 1]
           this.userPic = require("../../../users/uploads/userPics/".concat(pic_name));
           this.userIsTeacher = data["isTeacher"];
           this.userCourses = data["courses"];
