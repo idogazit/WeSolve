@@ -8,9 +8,14 @@
       />
       <p class="mb-0">Posted by:
         <span class="author-name">{{ question.author }}</span>
-        <span class="author-name">{{ question.questionId }}</span>
       </p>
       <p>{{ question.created_at }}</p>
+      <ul>
+        <li class="topic" v-for="topic in questionTopics.results" :key="topic">{{ topic["topicName"] }}</li>
+      </ul>
+      <ul>
+        <li class="qlabel" v-for="label in questionLabels.results" :key="label">{{ label["labelName"] }}: {{ label["labelValue"] }}</li>
+      </ul>
       <p>
         <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="80%">
       </p>
@@ -229,5 +234,34 @@ export default {
 .error {
   font-weight: bold;
   color: red; 
+}
+
+.topic {
+  margin: 0;
+  margin-top: 1.2em;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 10px;
+  position: relative;
+  display: inline-block;
+  left: auto;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  background-color: #98c9ef;
+  border-radius: 30px 30px 30px 30px;
+}
+
+.qlabel {
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 10px;
+  position: relative;
+  display: inline-block;
+  left: auto;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  background-color: #ec8fb5;
+  border-radius: 30px 30px 30px 30px;
 }
 </style>
