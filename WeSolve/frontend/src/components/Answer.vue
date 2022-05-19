@@ -4,9 +4,9 @@
       <strong>{{ answer.author }}</strong> &#8901; {{ answer.created_at }}
     </p>
     <p>{{ answer.body }}</p>
-    <p>
-      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="1000px" width="80%">
-    </p>
+<!--    <p>-->
+<!--      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="1000px" width="80%">-->
+<!--    </p>-->
     <div>
       <button
         class="btn btn-sm"
