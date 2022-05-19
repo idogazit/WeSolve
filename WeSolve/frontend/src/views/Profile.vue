@@ -14,12 +14,12 @@
         <div v-else>
           <p class="user-details">&#127894; Rank: {{ this.userRank }} &#127894;</p>
         </div>
-        <ul>
+        <!--<ul>
           <li><h4 class="my-courses">My Courses:</h4></li>
           <li v-for="course in userCourses" :key="course">
             &#127891; {{ course.replace("_", " - ") }}
           </li>
-        </ul>
+        </ul>-->
       </div>
     </div>
   </div>
@@ -53,7 +53,7 @@ export default {
           this.userFullName = data["first_name"].concat(" ", data["last_name"]);
           this.userEmail = data["email"];
           this.userRank= this.rankMap[data["rank"]];
-          const pic_name = data["userPic"].split('/')[data["userPic"].split('/').length - 1]
+          var pic_name = data["userPic"].split('/')[data["userPic"].split('/').length - 1]
           this.userPic = require("../../../users/uploads/userPics/".concat(pic_name));
           this.userIsTeacher = data["isTeacher"];
           this.userCourses = data["courses"];

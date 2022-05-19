@@ -4,9 +4,9 @@
       <strong>{{ answer.author }}</strong> &#8901; {{ answer.created_at }}
     </p>
     <p>{{ answer.body }}</p>
-<!--    <p>-->
-<!--      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="1000px" width="80%">-->
-<!--    </p>-->
+      <p v-if="answer.answerPDF !==null">
+        <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="1000px" width="80%">
+      </p>
     <div>
       <button
         class="btn btn-sm"
@@ -52,7 +52,7 @@ export default {
       userUpvotedAnswer: this.answer.user_has_voted, // TODO: needs to be replaced with user_has_upvoted
       upvotesCounter: this.answer.likes_count, // TODO: needs to be replaced with upvotes_count
       userDownvotedAnswer: this.answer.user_has_downvoted,
-      downvotesCounter: this.answer.downvotes_count,
+      downvotesCounter: this.answer.downvotes_count
     }
   },
   computed: {
@@ -61,7 +61,7 @@ export default {
       return this.answer.author === this.requestUser;
     },
     getAnswerPDF() {
-      const pdf_name = this.answer["answerPDF"].split('/')[(this.answer["answerPDF"].split('/')).length - 1]
+      var pdf_name = this.answer["answerPDF"].split('/')[(this.answer["answerPDF"].split('/')).length - 1]
       return "../../../questions/uploads/answersPDF/".concat(pdf_name).concat("/");
     },
   },
