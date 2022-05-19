@@ -11,11 +11,28 @@
       </p>
       <p>{{ question.created_at }}</p>
       <ul>
-        <li class="topic" v-for="topic in questionTopics.results" :key="topic">{{ topic["topicName"] }}</li>
+        <li class="topic label" v-for="topic in getTopics" :key="topic">{{ topic["topicName"] }}</li>
       </ul>
       <ul>
-        <li class="qlabel" v-for="label in questionLabels.results" :key="label">{{ label["labelName"] }}: {{ label["labelValue"] }}</li>
+        <li class="qlabel label" v-for="label in getLabels" :key="label">{{ label["labelName"] }}: {{ label["labelValue"] }}</li>
       </ul>
+      <p class="label-form-title label">Add Label:</p>
+      <form id="label-form" class="card label-submit" @submit.prevent="onSubmit">
+        <select v-model="selectedLabelName">
+          <option disabled selected id="defaultLabelName">Select Label</option>
+          <option v-for="label in allLabels.results" :key="label">{{ label["labelName"] }}</option>
+        </select>
+        <select v-model="selectedLabelValue">
+          <option disabled selected id="defaultLabelValue">Select Label Value</option>
+          <option v-for="labelValue in getLabelValues" :key="labelValue">{{ labelValue }}</option>
+        </select>
+        <button
+          type="submit"
+          class="btn btn-success"
+          @click="labelSubmit = true"
+          >Submit Label
+        </button>
+      </form>
       <p>
         <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="100%">
       </p>
@@ -45,7 +62,7 @@
       <div v-else>
         <button
           class="btn btn-sm btn-success"
-          @click="showForm = true"
+          @click="showForm = true; answerSubmit = true"
           >Answer the Question
         </button>
       </div>
@@ -101,9 +118,14 @@ export default {
       error: null,
       userHasAnswered: false,
       showForm: false,
+      answerSubmit: false,
       requestUser: null,
-      questionLabels: null,
-      questionTopics: null,
+      questionLabels: [],
+      questionTopics: [],
+      allLabels: [],
+      selectedLabelName: "",
+      selectedLabelValue: "",
+      labelSubmit: false,
     }
   },
   computed: {
@@ -114,6 +136,21 @@ export default {
     getQuestionPDF() {
       const pdf_name = this.question["questionPDF"].split('/')[(this.question["questionPDF"].split('/')).length - 1];
       return "../../../questions/uploads/questionsPDF/".concat(pdf_name).concat("/");
+    },
+    getLabelValues() {
+      var labelValues;
+      this.allLabels.results.forEach((result) => {
+        if (result.labelName === this.selectedLabelName) {
+          labelValues = result.possibleValues;
+        }
+      });
+      return labelValues;
+    },
+    getTopics() {
+      return this.questionTopics.results;
+    },
+    getLabels() {
+      return this.questionLabels.results;
     },
   },
   methods: {
@@ -144,6 +181,13 @@ export default {
               .then(data => {
                 if (data) {
                   this.questionTopics = data;
+                }
+              })
+            endpoint = `/api/labels/`;
+            apiService(endpoint)
+              .then(data => {
+                if (data) {
+                  this.allLabels = data;
                 }
               })
             this.userHasAnswered = data.user_has_answered;
@@ -183,21 +227,31 @@ export default {
     },
     onSubmit() {
       // Tell the REST API to create a new answer for this question based on the user input, then update some data properties
-      if (this.newAnswerBody) {
-        let endpoint = `/api/questions/${this.slug}/answer/`;
-        apiService(endpoint, "POST", { body: this.newAnswerBody })
-          .then(data => {
-            this.answers.unshift(data)
-          })
-        this.newAnswerBody = null;
-        this.showForm = false;
-        this.userHasAnswered = true;
-        if (this.error) {
-          this.error = null;
+      if (this.answerSubmit) {
+        if (this.newAnswerBody) {
+          let endpoint = `/api/questions/${this.slug}/answer/`;
+          apiService(endpoint, "POST", { body: this.newAnswerBody })
+            .then(data => {
+              this.answers.unshift(data)
+            })
+          this.newAnswerBody = null;
+          this.showForm = false;
+          this.userHasAnswered = true;
+          if (this.error) {
+            this.error = null;
+          }
+        } else {
+          this.error = "You can't send an empty answer!";
         }
-      } else {
-        this.error = "You can't send an empty answer!";
+        this.answerSubmit = false;
+      } else if (this.labelSubmit) {
+        let endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
+        apiService(endpoint, "POST", { labelName : this.selectedLabelName, labelValue: this.selectedLabelValue })
+        this.labelSubmit = false;
+        this.selectedLabelName = "";
+        this.selectedLabelValue = "";
       }
+      this.getQuestionData();
     },
     async deleteAnswer(answer) {
       // delete a given answer from the answers array and make a delete request to the REST API
@@ -244,7 +298,6 @@ export default {
   padding: 10px;
   position: relative;
   display: inline-block;
-  left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   background-color: #98c9ef;
@@ -258,10 +311,29 @@ export default {
   padding: 10px;
   position: relative;
   display: inline-block;
-  left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   background-color: #ec8fb5;
   border-radius: 30px 30px 30px 30px;
 }
+
+.label-submit {
+  width: 20%;
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+}
+
+.label-form-title {
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  left: 50%;
+  display: inline-block;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
 </style>
