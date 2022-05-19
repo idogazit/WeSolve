@@ -8,6 +8,7 @@
       />
       <p class="mb-0">Posted by:
         <span class="author-name">{{ question.author }}</span>
+        <span class="author-name">{{ question.questionId }}</span>
       </p>
       <p>{{ question.created_at }}</p>
       <p>
@@ -79,7 +80,7 @@ export default {
     slug: {
       type: String,
       required: true
-    }
+    },
   },
   components: {
     AnswerComponent,
@@ -96,6 +97,8 @@ export default {
       userHasAnswered: false,
       showForm: false,
       requestUser: null,
+      questionLabels: null,
+      questionTopics: null,
     }
   },
   computed: {
@@ -124,13 +127,26 @@ export default {
         .then(data => {
           if (data) {
             this.question = data;
+            endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
+            apiService(endpoint)
+              .then(data => {
+                if (data) {
+                  this.questionLabels = data;
+                }
+              })
+            endpoint = `/api/questions/${this.question["questionId"]}/topics/`;
+            apiService(endpoint)
+              .then(data => {
+                if (data) {
+                  this.questionTopics = data;
+                }
+              })
             this.userHasAnswered = data.user_has_answered;
             this.setPageTitle(data.content)
           } else {
             this.question = null;
             this.setPageTitle("404 - Page Not Found")
           }
-
         })
     },
     getQuestionAnswers() {
@@ -148,6 +164,15 @@ export default {
             this.next = data.next;
           } else {
             this.next = null;
+          }
+        })
+    },
+    getQuestionLabels() {
+      let endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
+      apiService(endpoint)
+        .then(data => {
+          if (data) {
+            this.questionLabels = data;
           }
         })
     },
@@ -186,7 +211,7 @@ export default {
     this.getQuestionData()
     this.getQuestionAnswers()
     this.setRequestUser()
-  }
+  },
 }
 </script>
 
