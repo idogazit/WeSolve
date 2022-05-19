@@ -104,8 +104,8 @@ export default {
       return this.question.author === this.requestUser;
     },
     getQuestionPDF() {
-      const url = this.question["questionPDF"].replace("http://localhost:8000/api/questions/".concat(this.question["slug"]).concat("/questions/uploads/questionsPDF/"), "");
-      return "../../../questions/uploads/questionsPDF/".concat(url).concat("/");
+      const pdf_name = this.question["questionPDF"].split('/')[(this.question["questionPDF"].split('/')).length - 1];
+      return "../../../questions/uploads/questionsPDF/".concat(pdf_name).concat("/");
     },
   },
   methods: {
