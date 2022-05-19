@@ -102,8 +102,8 @@ export default {
       userHasAnswered: false,
       showForm: false,
       requestUser: null,
-      questionLabels: null,
-      questionTopics: null,
+      questionLabels: [],
+      questionTopics: [],
     }
   },
   computed: {
