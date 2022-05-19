@@ -10,8 +10,14 @@
         <span class="author-name">{{ question.author }}</span>
       </p>
       <p>{{ question.created_at }}</p>
+      <ul>
+        <li class="topic" v-for="topic in questionTopics.results" :key="topic">{{ topic["topicName"] }}</li>
+      </ul>
+      <ul>
+        <li class="qlabel" v-for="label in questionLabels.results" :key="label">{{ label["labelName"] }}: {{ label["labelValue"] }}</li>
+      </ul>
       <p>
-        <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="80%">
+        <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="100%">
       </p>
       <hr>
       <div v-if="userHasAnswered">
@@ -79,7 +85,7 @@ export default {
     slug: {
       type: String,
       required: true
-    }
+    },
   },
   components: {
     AnswerComponent,
@@ -96,6 +102,8 @@ export default {
       userHasAnswered: false,
       showForm: false,
       requestUser: null,
+      questionLabels: null,
+      questionTopics: null,
     }
   },
   computed: {
@@ -104,7 +112,7 @@ export default {
       return this.question.author === this.requestUser;
     },
     getQuestionPDF() {
-      const pdf_name = this.question["questionPDF"].split('/')[(this.question["questionPDF"].split('/')).length - 1];
+      var pdf_name = this.question["questionPDF"].split('/')[(this.question["questionPDF"].split('/')).length - 1];
       return "../../../questions/uploads/questionsPDF/".concat(pdf_name).concat("/");
     },
   },
@@ -124,13 +132,26 @@ export default {
         .then(data => {
           if (data) {
             this.question = data;
+            endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
+            apiService(endpoint)
+              .then(data => {
+                if (data) {
+                  this.questionLabels = data;
+                }
+              })
+            endpoint = `/api/questions/${this.question["questionId"]}/topics/`;
+            apiService(endpoint)
+              .then(data => {
+                if (data) {
+                  this.questionTopics = data;
+                }
+              })
             this.userHasAnswered = data.user_has_answered;
             this.setPageTitle(data.content)
           } else {
             this.question = null;
             this.setPageTitle("404 - Page Not Found")
           }
-
         })
     },
     getQuestionAnswers() {
@@ -148,6 +169,15 @@ export default {
             this.next = data.next;
           } else {
             this.next = null;
+          }
+        })
+    },
+    getQuestionLabels() {
+      let endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
+      apiService(endpoint)
+        .then(data => {
+          if (data) {
+            this.questionLabels = data;
           }
         })
     },
@@ -186,7 +216,7 @@ export default {
     this.getQuestionData()
     this.getQuestionAnswers()
     this.setRequestUser()
-  }
+  },
 }
 </script>
 
@@ -204,5 +234,34 @@ export default {
 .error {
   font-weight: bold;
   color: red; 
+}
+
+.topic {
+  margin: 0;
+  margin-top: 1.2em;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 10px;
+  position: relative;
+  display: inline-block;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  background-color: #98c9ef;
+  border-radius: 30px 30px 30px 30px;
+}
+
+.qlabel {
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 10px;
+  position: relative;
+  display: inline-block;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  background-color: #ec8fb5;
+  border-radius: 30px 30px 30px 30px;
 }
 </style>
