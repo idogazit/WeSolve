@@ -251,7 +251,7 @@ class examAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         kwarg_course = self.kwargs.get("course")
-        return Exam.objects.filter(courseName=kwarg_course).defer("CourseName")
+        return Exam.objects.filter(courseName=kwarg_course).defer("courseName")
 
 
 class LabelListAPIView(generics.ListAPIView):
@@ -314,3 +314,13 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
         serializer_context = {"request": request}
         serializer = self.serializer_class(topicQuest, context=serializer_context)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    class SimilarQuestionsAPIView(generics.ListAPIView):
+        serializer_class = QuestionSerializer
+
+        def get_queryset(self):
+            kwarg_question = self.kwargs.get("questionId")
+            base_question = QuestionTopic.objects.get(questionId=kwarg_question)
+            
+            none_qs = QuestionLabel.objects.none()
+            return none_qs
