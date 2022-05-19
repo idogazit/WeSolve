@@ -99,7 +99,6 @@ export default {
       userHasAnswered: false,
       showForm: false,
       requestUser: null,
-      answerData: {},
     }
   },
   computed: {
@@ -159,8 +158,7 @@ export default {
       // Tell the REST API to create a new answer for this question based on the user input, then update some data properties
       if (this.newAnswerBody) {
         let endpoint = `/api/questions/${this.slug}/answer/`;
-        this.answerData["body"] = this.newAnswerBody;
-        apiService(endpoint, "POST", this.answerData)
+        apiService(endpoint, "POST", { "body": this.newAnswerBody})
           .then(data => {
             this.answers.unshift(data)
           })
@@ -175,7 +173,7 @@ export default {
       }
     },
     uploadFile() {
-      this.answerData["answerPDF"] = this.$refs.ansPDF.files[0];
+
     },
     async deleteAnswer(answer) {
       // delete a given answer from the answers array and make a delete request to the REST API
