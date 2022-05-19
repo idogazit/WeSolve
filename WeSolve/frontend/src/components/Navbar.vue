@@ -37,13 +37,6 @@
               >Contact Us
             </router-link>
           </li>
-          <li v-if="isAdmin" class="nav-item mx-1">
-            <router-link 
-              :to="{ name: 'question-editor' }" 
-              class="btn btn-sm btn-danger"
-              >Ask Question
-            </router-link>
-          </li>
           <li class="nav-item">
             <a class="btn btn-sm btn-outline-secondary" href="/accounts/logout/"
               >Logout
