@@ -134,7 +134,7 @@ export default {
       return this.question.author === this.requestUser;
     },
     getQuestionPDF() {
-      const pdf_name = this.question["questionPDF"].split('/')[(this.question["questionPDF"].split('/')).length - 1];
+      var pdf_name = this.question["questionPDF"].split('/')[(this.question["questionPDF"].split('/')).length - 1];
       return "../../../questions/uploads/questionsPDF/".concat(pdf_name).concat("/");
     },
     getLabelValues() {
