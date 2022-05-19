@@ -9,16 +9,17 @@
           <span class="question-author">{{ question.author }}</span>
         </p>
         <h2>
-          <router-link
-            :to="{ name: 'question', params: { slug: question.slug } }"
+          <button
+            @click="chooseQuestion(question.slug)"
             class="question-link"
             >{{ question.content }}
-          </router-link>
+          </button>
         </h2>
         <p>Answers: {{ question.answers_count }}</p>
         <hr>
       </div>
     </div>
+    <QuestionView v-if="showChosenQuestion" :slug="chosenQuestionSlug" />
   </div>
 </template>
 
@@ -26,11 +27,13 @@
 import { apiService } from "@/common/api.service.js";
 import Breadcrumb from "@/components/BreadCrumb.vue";
 import SelectNext from "@/components/SelectNext.vue";
+import QuestionView from "@/components/Question.vue";
 export default {
   name: "HomeView",
   components: {
     Breadcrumb,
-    SelectNext
+    SelectNext,
+    QuestionView
   },
   data() {
     return {
@@ -40,10 +43,18 @@ export default {
       links: [],
       examsId: [],
       showQuestions: false,
-      showNav: true
+      showNav: true,
+      showChosenQuestion: false,
+      chosenQuestionSlug: null
     }
   },
   methods: {
+    chooseQuestion(slug) {
+      this.showChosenQuestion = true
+      this.showQuestions = false
+      this.showNav = false
+      this.chosenQuestionSlug = slug
+    },
     getQuestions(examId) {
       this.showQuestions = true
       // make a GET Request to the questions list endpoint and populate the questions array
@@ -63,6 +74,7 @@ export default {
     selected(crumb, ci) {
       this.showNav = true
       this.showQuestions = false
+      this.showChosenQuestion = false
       this.crumbs = this.crumbs.slice(0, ci + 1)
 
       const reqLevel = this.level[this.crumbs.length]
@@ -127,6 +139,9 @@ export default {
 .question-link {
   font-weight: bold;
   color: black;
+  padding: 0;
+  border: none;
+  background: none;
 }
 
 .question-link:hover {
