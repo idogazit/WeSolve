@@ -22,11 +22,15 @@ export default {
         crumbs: {
             type: Array,
             required: true
+        },
+        inQuestion: {
+            type: Boolean,
+            required: true
         }
     },
     methods: {
         isLast(index){
-            return index === this.crumbs.length - 1;
+            return index === this.crumbs.length - 1 && !this.inQuestion;
         },
         selected(crumb, ci){
             this.$emit('selected', crumb, ci);

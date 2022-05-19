@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <Breadcrumb :crumbs="crumbs" @selected="selected" />
+    <Breadcrumb :crumbs="crumbs" :inQuestion="showChosenQuestion" @selected="selected" />
     <SelectNext v-if="showNav" :links="links" :level="level[crumbs.length]" @selectedLink="selectedLink" />
     <div v-if="showQuestions" class="container mt-2">
       <div v-for="question in questions"
@@ -45,7 +45,8 @@ export default {
       showQuestions: false,
       showNav: true,
       showChosenQuestion: false,
-      chosenQuestionSlug: null
+      chosenQuestionSlug: null,
+      chosenExamIndex: null
     }
   },
   methods: {
@@ -75,34 +76,40 @@ export default {
       this.showNav = true
       this.showQuestions = false
       this.showChosenQuestion = false
+      this.questions = []
       this.crumbs = this.crumbs.slice(0, ci + 1)
 
       const reqLevel = this.level[this.crumbs.length]
       console.log(reqLevel)
-
-      let endpoint
-      if (this.crumbs.length == 1) {
-        endpoint = "/api/nav/faculties/"
+      if (reqLevel == 'question'){
+        this.showNav = false
+        this.getQuestions(this.examsId[this.chosenExamIndex])
       } else {
-        endpoint = "/api/nav/" + crumb + "/" + this.level[this.crumbs.length] + "s/"
-      }
-      if (reqLevel == 'exam') {
-          apiService(endpoint)
-          .then(data => {
-            this.links = data["results"].map(({ examTime }) => examTime)
-            this.examsId = data["results"].map(({ examId }) => examId)
-          })
+        let endpoint
+        if (this.crumbs.length == 1) {
+          endpoint = "/api/nav/faculties/"
         } else {
-          apiService(endpoint)
-          .then(data => {
-            this.links = data["results"]
-          })
+          endpoint = "/api/nav/" + crumb + "/" + this.level[this.crumbs.length] + "s/"
         }
+        if (reqLevel == 'exam') {
+            apiService(endpoint)
+            .then(data => {
+              this.links = data["results"].map(({ examTime }) => examTime)
+              this.examsId = data["results"].map(({ examId }) => examId)
+            })
+          } else {
+            apiService(endpoint)
+            .then(data => {
+              this.links = data["results"]
+            })
+          }
+      }
     },
     selectedLink(link, linkIndex) {
       const reqLevel = this.level[this.crumbs.length + 1]
       if (reqLevel == 'question'){
         this.showNav = false
+        this.chosenExamIndex = linkIndex
         this.getQuestions(this.examsId[linkIndex])
       } else {
         let endpoint = "/api/nav/" + link + "/" + reqLevel + "s/"

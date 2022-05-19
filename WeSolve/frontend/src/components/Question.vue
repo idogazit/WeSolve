@@ -10,11 +10,9 @@
         <span class="author-name">{{ question.author }}</span>
       </p>
       <p>{{ question.created_at }}</p>
-      <ul>
-        <li class="topic" v-for="topic in questionTopics.results" :key="topic">{{ topic["topicName"] }}</li>
-      </ul>
-      <ul>
-        <li class="qlabel" v-for="label in questionLabels.results" :key="label">{{ label["labelName"] }}: {{ label["labelValue"] }}</li>
+      <ul class="list-group list-group-horizontal-sm">
+        <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="topic in questionTopics.results" :key="topic"><span class="badge badge-danger">{{ topic["topicName"] }}</span></li>
+        <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="label in questionLabels.results" :key="label"><span class="badge badge-warning">{{ label["labelName"] }}: {{ label["labelValue"] }}</span></li>
       </ul>
       <p>
         <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="100%">
@@ -234,34 +232,5 @@ export default {
 .error {
   font-weight: bold;
   color: red; 
-}
-
-.topic {
-  margin: 0;
-  margin-top: 1.2em;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 10px;
-  position: relative;
-  display: inline-block;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  background-color: #98c9ef;
-  border-radius: 30px 30px 30px 30px;
-}
-
-.qlabel {
-  margin: 0;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 10px;
-  position: relative;
-  display: inline-block;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  background-color: #ec8fb5;
-  border-radius: 30px 30px 30px 30px;
 }
 </style>
