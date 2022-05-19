@@ -4,7 +4,7 @@
       <div class="my-4">
         <h2>User Profile</h2>
         <img :src="userPic" alt="">
-        <h3><span class="label label-primary">{{ this.userFullName }}</span></h3>
+        <h3>{{ this.userFullName }}</h3>
         <div>
           <p class="user-details">{{ this.userEmail }}</p>
         </div>
