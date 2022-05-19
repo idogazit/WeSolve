@@ -17,7 +17,7 @@
         <li class="qlabel" v-for="label in questionLabels.results" :key="label">{{ label["labelName"] }}: {{ label["labelValue"] }}</li>
       </ul>
       <p>
-        <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="80%">
+        <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="100%">
       </p>
       <hr>
       <div v-if="userHasAnswered">
@@ -244,7 +244,7 @@ export default {
   padding: 10px;
   position: relative;
   display: inline-block;
-  left: auto;
+  left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   background-color: #98c9ef;
@@ -258,7 +258,7 @@ export default {
   padding: 10px;
   position: relative;
   display: inline-block;
-  left: auto;
+  left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   background-color: #ec8fb5;
