@@ -20,6 +20,7 @@
       </div>
     </div>
     <QuestionView v-if="showChosenQuestion" :slug="chosenQuestionSlug" />
+    <SimilarQuestions v-if="showChosenQuestion" :questionSlug="chosenQuestionSlug" />
   </div>
 </template>
 
@@ -28,12 +29,14 @@ import { apiService } from "@/common/api.service.js";
 import Breadcrumb from "@/components/BreadCrumb.vue";
 import SelectNext from "@/components/SelectNext.vue";
 import QuestionView from "@/components/Question.vue";
+import SimilarQuestions from "@/components/SimilarQuestions.vue";
 export default {
   name: "HomeView",
   components: {
     Breadcrumb,
     SelectNext,
-    QuestionView
+    QuestionView,
+    SimilarQuestions
   },
   data() {
     return {

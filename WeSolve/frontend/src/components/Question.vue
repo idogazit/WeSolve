@@ -10,27 +10,7 @@
         <span class="author-name">{{ question.author }}</span>
       </p>
       <p>{{ question.created_at }}</p>
-      <ul class="list-group list-group-horizontal-sm">
-        <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="topic in getTopics" :key="topic"><span class="badge badge-danger">{{ topic["topicName"] }}</span></li>
-        <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="label in getLabels" :key="label"><span class="badge badge-warning">{{ label["labelName"] }}: {{ label["labelValue"] }}</span></li>
-      </ul>
-      <p class="label-form-title label">Add Label:</p>
-      <form id="label-form" class="card label-submit" @submit.prevent="onSubmit">
-        <select v-model="selectedLabelName">
-          <option disabled selected id="defaultLabelName">Select Label</option>
-          <option v-for="label in allLabels.results" :key="label">{{ label["labelName"] }}</option>
-        </select>
-        <select v-model="selectedLabelValue">
-          <option disabled selected id="defaultLabelValue">Select Label Value</option>
-          <option v-for="labelValue in getLabelValues" :key="labelValue">{{ labelValue }}</option>
-        </select>
-        <button
-          type="submit"
-          class="btn btn-success"
-          @click="labelSubmit = true"
-          >Submit Label
-        </button>
-      </form>
+      <LabelsTopics :questionId="question.questionId" />
       <p>
         <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="100%">
       </p>
@@ -95,6 +75,7 @@
 import { apiService } from "@/common/api.service.js";
 import AnswerComponent from "@/components/Answer.vue";
 import QuestionActions from "@/components/QuestionActions.vue";
+import LabelsTopics from "@/components/LabelsTopics.vue";
 export default {
   name: "QuestionView",
   props: {
@@ -105,7 +86,8 @@ export default {
   },
   components: {
     AnswerComponent,
-    QuestionActions
+    QuestionActions,
+    LabelsTopics
   },
   data() {
     return {
@@ -118,13 +100,7 @@ export default {
       userHasAnswered: false,
       showForm: false,
       requestUser: null,
-      questionLabels: [],
-      questionTopics: [],
-      allLabels: [],
-      selectedLabelName: "",
-      selectedLabelValue: "",
-      labelSubmit: false,
-      answerUploadPDF: null,
+      answerUploadPDF: null
     }
   },
   computed: {
@@ -135,22 +111,7 @@ export default {
     getQuestionPDF() {
       var pdf_name = this.question["questionPDF"].split('/')[(this.question["questionPDF"].split('/')).length - 1];
       return "../../../questions/uploads/questionsPDF/".concat(pdf_name).concat("/");
-    },
-    getLabelValues() {
-      var labelValues;
-      this.allLabels.results.forEach((result) => {
-        if (result.labelName === this.selectedLabelName) {
-          labelValues = result.possibleValues;
-        }
-      });
-      return labelValues;
-    },
-    getTopics() {
-      return this.questionTopics.results;
-    },
-    getLabels() {
-      return this.questionLabels.results;
-    },
+    }
   },
   methods: {
     setPageTitle(title) {
@@ -168,27 +129,6 @@ export default {
           .then(data => {
             if (data) {
               this.question = data;
-              endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
-              apiService(endpoint)
-                  .then(data => {
-                    if (data) {
-                      this.questionLabels = data;
-                    }
-                  })
-              endpoint = `/api/questions/${this.question["questionId"]}/topics/`;
-              apiService(endpoint)
-                  .then(data => {
-                    if (data) {
-                      this.questionTopics = data;
-                    }
-                  })
-              endpoint = `/api/labels/`;
-              apiService(endpoint)
-                  .then(data => {
-                    if (data) {
-                      this.allLabels = data;
-                    }
-                  })
               this.userHasAnswered = data.user_has_answered;
               this.setPageTitle(data.content)
             } else {
@@ -215,49 +155,30 @@ export default {
             }
           })
     },
-    getQuestionLabels() {
-      let endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
-      apiService(endpoint)
-          .then(data => {
-            if (data) {
-              this.questionLabels = data;
-            }
-          })
-    },
     onSubmit() {
       // Tell the REST API to create a new answer for this question based on the user input, then update some data properties
-      if (this.labelSubmit) {
-        let endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
-        apiService(endpoint, "POST", {labelName: this.selectedLabelName, labelValue: this.selectedLabelValue})
-        this.labelSubmit = false;
-        this.selectedLabelName = "";
-        this.selectedLabelValue = "";
+      let answerData = {};
+      if (!this.newAnswerBody && !this.answerUploadPDF) {
+        this.error = "You can't send an empty answer!";
       } else {
-        let answerData = {};
-        if (!this.newAnswerBody && !this.answerUploadPDF) {
-          this.error = "You can't send an empty answer!";
-        } else {
-          if (this.newAnswerBody) {
-            answerData.body = this.newAnswerBody;
-          }
-          if (this.answerUploadPDF) {
-            answerData.answerPDF = this.answerUploadPDF;
-          }
-          let endpoint = `/api/questions/${this.slug}/answer/`;
-          apiService(endpoint, "POST", answerData)
-              .then(data => {
-                this.answers.unshift(data)
-              })
-          this.newAnswerBody = null;
-          this.showForm = false;
-          this.userHasAnswered = true;
-          if (this.error) {
-            this.error = null;
-          }
+        if (this.newAnswerBody) {
+          answerData.body = this.newAnswerBody;
+        }
+        if (this.answerUploadPDF) {
+          answerData.answerPDF = this.answerUploadPDF;
+        }
+        let endpoint = `/api/questions/${this.slug}/answer/`;
+        apiService(endpoint, "POST", answerData)
+            .then(data => {
+              this.answers.unshift(data)
+            })
+        this.newAnswerBody = null;
+        this.showForm = false;
+        this.userHasAnswered = true;
+        if (this.error) {
+          this.error = null;
         }
       }
-      this.questionLabels = [];
-      this.questionTopics = [];
       this.getQuestionData();
     },
     uploadFile() {
@@ -298,25 +219,6 @@ export default {
 .error {
   font-weight: bold;
   color: red; 
-}
-
-.label-submit {
-  width: 20%;
-  margin: 0;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 20px;
-}
-
-.label-form-title {
-  margin: 0;
-  margin-left: auto;
-  margin-right: auto;
-  position: relative;
-  left: 50%;
-  display: inline-block;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
 }
 
 .submit-ans {
