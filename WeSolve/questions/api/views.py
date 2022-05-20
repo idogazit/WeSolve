@@ -34,7 +34,7 @@ class AnswerCreateAPIView(generics.CreateAPIView):
 
         if question.answers.filter(author=request_user).exists():
             raise ValidationError("You have already answered this Question!")
-
+        
         serializer.save(author=request_user, question=question)
 
 
@@ -44,9 +44,9 @@ class AnswerUpvoteAPIView(APIView):
     permission_classes = [IsAuthenticated]
     lookup_field = "answerId"
 
-    def delete(self, request, pk):
+    def delete(self, request, answerId):
         """Remove request.user from the upvoters queryset of an answer instance."""
-        answer = get_object_or_404(Answer, pk=pk)
+        answer = get_object_or_404(Answer, answerId=answerId)
         user = request.user
 
         answer.upvoters.remove(user)
@@ -58,15 +58,19 @@ class AnswerUpvoteAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, pk):
+    def post(self, request, answerId):
         """Add request.user to the upvoters queryset of an answer instance."""
-        answer = get_object_or_404(Answer, pk=pk)
+        answer = get_object_or_404(Answer, answerId=answerId)
         user = request.user
 
-        if user in answer.downvoters:
+        print(user)
+        print(answer.downvoters)
+
+        if user in answer.downvoters.all():
             answer.downvoters.remove(user)
             answer.ranking += 1
         
+        print("success")
         answer.upvoters.add(user)
         answer.ranking += 1
         answer.save()
@@ -83,9 +87,9 @@ class AnswerDownvoteAPIView(APIView):
     permission_classes = [IsAuthenticated]
     lookup_field = "answerId"
 
-    def delete(self, request, pk):
+    def delete(self, request, answerId):
         """Remove request.user from the downvoters queryset of an answer instance."""
-        answer = get_object_or_404(Answer, pk=pk)
+        answer = get_object_or_404(Answer, answerId=answerId)
         user = request.user
 
         answer.downvoters.remove(user)
@@ -97,12 +101,12 @@ class AnswerDownvoteAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, pk):
+    def post(self, request, answerId):
         """Add request.user to the downvoters queryset of an answer instance."""
-        answer = get_object_or_404(Answer, pk=pk)
+        answer = get_object_or_404(Answer, answerId=answerId)
         user = request.user
 
-        if user in answer.upvoters:
+        if user in answer.upvoters.all():
             answer.upvoters.remove(user)
             answer.ranking -= 1
         
@@ -157,6 +161,7 @@ class QuestionListAPIView(generics.ListAPIView):
 class QuestionLabelListAPIView(generics.ListCreateAPIView):
     serializer_class = QuestionLabelSerializer
     output_label_user = CustomUser.objects.get(username="admin")
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         kwarg_question = self.kwargs.get("question")
@@ -190,7 +195,7 @@ class QuestionLabelListAPIView(generics.ListCreateAPIView):
     
     def getAverageNumericLabel(self, queryset):
         avg = 0
-        count = len(queryset)
+        count = queryset.count()
         if count == 0:
             return None # may need to change
         for user_rank in queryset:
@@ -205,7 +210,7 @@ class QuestionLabelListAPIView(generics.ListCreateAPIView):
     
     def getMaxOccurenceLabel(self, queryset):
         labels = {}
-        count = len(queryset)
+        count = queryset.count()
         if count == 0:
             return None # may need to change
         for user_label in queryset:
@@ -250,7 +255,7 @@ class examAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         kwarg_course = self.kwargs.get("course")
-        return Exam.objects.filter(courseName=kwarg_course)
+        return Exam.objects.filter(courseName=kwarg_course).defer("courseName")
 
 
 class LabelListAPIView(generics.ListAPIView):
@@ -313,3 +318,13 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
         serializer_context = {"request": request}
         serializer = self.serializer_class(topicQuest, context=serializer_context)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    class SimilarQuestionsAPIView(generics.ListAPIView):
+        serializer_class = QuestionSerializer
+
+        def get_queryset(self):
+            kwarg_question = self.kwargs.get("questionId")
+            base_question = QuestionTopic.objects.get(questionId=kwarg_question)
+            
+            none_qs = QuestionLabel.objects.none()
+            return none_qs

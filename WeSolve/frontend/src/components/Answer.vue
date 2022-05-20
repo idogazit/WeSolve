@@ -4,10 +4,10 @@
       <strong>{{ answer.author }}</strong> &#8901; {{ answer.created_at }}
     </p>
     <p>{{ answer.body }}</p>
-      <p v-if="answer.answerPDF !==null">
-        <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="1000px" width="80%">
-      </p>
-    <div>
+    <div v-if="answer.answerPDF !==null">
+      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="1000px" width="80%">
+    </div>
+    <div v-if="isAnswerAuthor == false">
       <button
         class="btn btn-sm"
         @click="toggleUpvote"
@@ -15,7 +15,7 @@
           'btn-success': userUpvotedAnswer,
           'btn-outline-success': !userUpvotedAnswer,
           }"
-        :disabled=userDownvotedAnswer
+        :disabled="userDownvotedAnswer"
         ><strong>Upvote [{{ upvotesCounter }}]</strong>
       </button>
       <button
@@ -25,7 +25,7 @@
           'btn-danger': userDownvotedAnswer,
           'btn-outline-danger': !userDownvotedAnswer
           }"
-        :disabled=userUpvotedAnswer
+        :disabled="userUpvotedAnswer"
         ><strong>Downvote [{{ downvotesCounter }}]</strong>
       </button>
     </div>
@@ -49,8 +49,8 @@ export default {
   },
   data() {
     return {
-      userUpvotedAnswer: this.answer.user_has_voted, // TODO: needs to be replaced with user_has_upvoted
-      upvotesCounter: this.answer.likes_count, // TODO: needs to be replaced with upvotes_count
+      userUpvotedAnswer: this.answer.user_has_upvoted,
+      upvotesCounter: this.answer.upvotes_count,
       userDownvotedAnswer: this.answer.user_has_downvoted,
       downvotesCounter: this.answer.downvotes_count
     }
@@ -74,13 +74,13 @@ export default {
     upvoteAnswer() {
       this.userUpvotedAnswer = true;
       this.upvotesCounter += 1;
-      let endpoint = `/api/answers/${ this.answer.id }/like/`;
+      let endpoint = `/api/answers/${ this.answer.answerId }/upvote/`;
       apiService(endpoint, "POST")
     },
     unUpvoteAnswer() {
       this.userUpvotedAnswer = false;
       this.upvotesCounter -= 1;
-      let endpoint = `/api/answers/${ this.answer.id }/like/`;
+      let endpoint = `/api/answers/${ this.answer.answerId }/upvote/`;
       apiService(endpoint, "DELETE")
     },
     toggleDownvote() {
@@ -91,13 +91,13 @@ export default {
     downvoteAnswer() {
       this.userDownvotedAnswer = true;
       this.downvotesCounter += 1;
-      let endpoint = `/api/answers/${ this.answer.id }/like/`;
+      let endpoint = `/api/answers/${ this.answer.answerId }/downvote/`;
       apiService(endpoint, "POST")
     },
     unDownvoteAnswer() {
       this.userDownvotedAnswer = false;
       this.downvotesCounter -= 1;
-      let endpoint = `/api/answers/${ this.answer.id }/like/`;
+      let endpoint = `/api/answers/${ this.answer.answerId }/downvote/`;
       apiService(endpoint, "DELETE")
     },
     triggerDeleteAnswer() {
@@ -107,4 +107,3 @@ export default {
   }
 }
 </script>
-

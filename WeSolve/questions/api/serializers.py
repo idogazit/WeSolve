@@ -8,7 +8,8 @@ class AnswerSerializer(serializers.ModelSerializer):
     created_at = serializers.SerializerMethodField()
     upvotes_count = serializers.SerializerMethodField()
     downvotes_count = serializers.SerializerMethodField()
-    user_has_voted = serializers.SerializerMethodField()
+    user_has_upvoted = serializers.SerializerMethodField()
+    user_has_downvoted = serializers.SerializerMethodField()
     question_slug = serializers.SerializerMethodField()
 
     class Meta:
@@ -24,11 +25,15 @@ class AnswerSerializer(serializers.ModelSerializer):
     def get_downvotes_count(self, instance):
         return instance.downvoters.count()
     
-    def get_user_has_voted(self, instance):
+    def get_user_has_upvoted(self, instance):
         request = self.context.get("request")
         has_upvoted = instance.upvoters.filter(pk=request.user.pk).exists()
+        return has_upvoted
+    
+    def get_user_has_downvoted(self, instance):
+        request = self.context.get("request")
         has_downvoted = instance.downvoters.filter(pk=request.user.pk).exists()
-        return has_upvoted or has_downvoted
+        return has_downvoted
 
     def get_question_slug(self, instance):
         return instance.question.slug
