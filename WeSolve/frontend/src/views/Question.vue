@@ -34,7 +34,7 @@
         </button>
       </form>
       <p>
-        <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="100%">
+        <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="800px" width="100%">
       </p>
       <hr>
       <div v-if="userHasAnswered">
