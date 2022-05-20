@@ -34,7 +34,7 @@
         </button>
       </form>
       <p>
-        <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="800px" width="100%">
+        <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="100%">
       </p>
       <hr>
       <div v-if="userHasAnswered">
@@ -54,7 +54,8 @@
             ></textarea>
           </div>
           <div class="card-footer px-3">
-            <button type="submit" class="btn btn-sm btn-success">Submit Your Answer</button>
+            <input class="upload-pdf" type="file" name="upload" accept="application/pdf" @change="uploadFile"/>
+            <button type="submit" class="btn btn-sm btn-success submit-ans">Submit Your Answer</button>
           </div>
         </form>
         <p v-if="error" class="error mt-2">{{ error }}</p>
@@ -62,7 +63,7 @@
       <div v-else>
         <button
           class="btn btn-sm btn-success"
-          @click="showForm = true; answerSubmit = true"
+          @click="showForm = true"
           >Answer the Question
         </button>
       </div>
@@ -118,7 +119,6 @@ export default {
       error: null,
       userHasAnswered: false,
       showForm: false,
-      answerSubmit: false,
       requestUser: null,
       questionLabels: [],
       questionTopics: [],
@@ -126,6 +126,7 @@ export default {
       selectedLabelName: "",
       selectedLabelValue: "",
       labelSubmit: false,
+      answerUploadPDF: null,
     }
   },
   computed: {
@@ -166,37 +167,37 @@ export default {
       // get the details of a question instance from the REST API and call setPageTitle
       let endpoint = `/api/questions/${this.slug}/`;
       apiService(endpoint)
-        .then(data => {
-          if (data) {
-            this.question = data;
-            endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
-            apiService(endpoint)
-              .then(data => {
-                if (data) {
-                  this.questionLabels = data;
-                }
-              })
-            endpoint = `/api/questions/${this.question["questionId"]}/topics/`;
-            apiService(endpoint)
-              .then(data => {
-                if (data) {
-                  this.questionTopics = data;
-                }
-              })
-            endpoint = `/api/labels/`;
-            apiService(endpoint)
-              .then(data => {
-                if (data) {
-                  this.allLabels = data;
-                }
-              })
-            this.userHasAnswered = data.user_has_answered;
-            this.setPageTitle(data.content)
-          } else {
-            this.question = null;
-            this.setPageTitle("404 - Page Not Found")
-          }
-        })
+          .then(data => {
+            if (data) {
+              this.question = data;
+              endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
+              apiService(endpoint)
+                  .then(data => {
+                    if (data) {
+                      this.questionLabels = data;
+                    }
+                  })
+              endpoint = `/api/questions/${this.question["questionId"]}/topics/`;
+              apiService(endpoint)
+                  .then(data => {
+                    if (data) {
+                      this.questionTopics = data;
+                    }
+                  })
+              endpoint = `/api/labels/`;
+              apiService(endpoint)
+                  .then(data => {
+                    if (data) {
+                      this.allLabels = data;
+                    }
+                  })
+              this.userHasAnswered = data.user_has_answered;
+              this.setPageTitle(data.content)
+            } else {
+              this.question = null;
+              this.setPageTitle("404 - Page Not Found")
+            }
+          })
     },
     getQuestionAnswers() {
       // get a page of answers for a single question from the REST API's paginated 'Questions Endpoint'
@@ -206,52 +207,63 @@ export default {
       }
       this.loadingAnswers = true;
       apiService(endpoint)
-        .then(data => {
-          this.answers.push(...data.results);
-          this.loadingAnswers = false;
-          if (data.next) {
-            this.next = data.next;
-          } else {
-            this.next = null;
-          }
-        })
+          .then(data => {
+            this.answers.push(...data.results);
+            this.loadingAnswers = false;
+            if (data.next) {
+              this.next = data.next;
+            } else {
+              this.next = null;
+            }
+          })
     },
     getQuestionLabels() {
       let endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
       apiService(endpoint)
-        .then(data => {
-          if (data) {
-            this.questionLabels = data;
-          }
-        })
+          .then(data => {
+            if (data) {
+              this.questionLabels = data;
+            }
+          })
     },
     onSubmit() {
       // Tell the REST API to create a new answer for this question based on the user input, then update some data properties
-      if (this.answerSubmit) {
-        if (this.newAnswerBody) {
+      if (this.labelSubmit) {
+        let endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
+        apiService(endpoint, "POST", {labelName: this.selectedLabelName, labelValue: this.selectedLabelValue})
+        this.labelSubmit = false;
+        this.selectedLabelName = "";
+        this.selectedLabelValue = "";
+      } else {
+        let answerData = {};
+        if (!this.newAnswerBody && !this.answerUploadPDF) {
+          this.error = "You can't send an empty answer!";
+        } else {
+          if (this.newAnswerBody) {
+            answerData.body = this.newAnswerBody;
+          }
+          if (this.answerUploadPDF) {
+            answerData.answerPDF = this.answerUploadPDF;
+          }
           let endpoint = `/api/questions/${this.slug}/answer/`;
-          apiService(endpoint, "POST", { body: this.newAnswerBody })
-            .then(data => {
-              this.answers.unshift(data)
-            })
+          apiService(endpoint, "POST", answerData)
+              .then(data => {
+                this.answers.unshift(data)
+              })
           this.newAnswerBody = null;
           this.showForm = false;
           this.userHasAnswered = true;
           if (this.error) {
             this.error = null;
           }
-        } else {
-          this.error = "You can't send an empty answer!";
         }
-        this.answerSubmit = false;
-      } else if (this.labelSubmit) {
-        let endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
-        apiService(endpoint, "POST", { labelName : this.selectedLabelName, labelValue: this.selectedLabelValue })
-        this.labelSubmit = false;
-        this.selectedLabelName = "";
-        this.selectedLabelValue = "";
       }
+      this.questionLabels = [];
+      this.questionTopics = [];
       this.getQuestionData();
+    },
+    uploadFile() {
+      this.answerUploadPDF = this.$refs.file.files[0];
     },
     async deleteAnswer(answer) {
       // delete a given answer from the answers array and make a delete request to the REST API
@@ -334,6 +346,11 @@ export default {
   display: inline-block;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+}
+
+.submit-ans {
+  margin-top: 10px;
+  display: block;
 }
 
 </style>
