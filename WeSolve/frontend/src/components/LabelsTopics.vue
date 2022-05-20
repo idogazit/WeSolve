@@ -3,24 +3,44 @@
         <ul class="list-group list-group-horizontal-sm">
             <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="topic in getTopics" :key="topic"><span class="badge badge-danger">{{ topic["topicName"] }}</span></li>
             <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="label in getLabels" :key="label"><span class="badge badge-warning">{{ label["labelName"] }}: {{ label["labelValue"] }}</span></li>
-            <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3"><img id="plus" src="https://img.icons8.com/external-tanah-basah-glyph-tanah-basah/48/26e07f/external-plus-essentials-tanah-basah-glyph-tanah-basah-2.png"/></li>
+            <li v-if="showForm == false" class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3">
+                <button class="btn btn-default m-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Add Label">
+                    <img @click="enableShowForm" id="plus" src="https://img.icons8.com/external-tanah-basah-glyph-tanah-basah/48/26e07f/external-plus-essentials-tanah-basah-glyph-tanah-basah-2.png" />
+                </button>
+            </li>
+            <li  class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3">
+            </li>
         </ul>
-        <p class="label-form-title label">Add Label:</p>
-        <form id="label-form" class="card label-submit" @submit.prevent="onSubmit">
-            <select v-model="selectedLabelName">
-                <option disabled selected id="defaultLabelName">Select Label</option>
-                <option v-for="label in allLabels.results" :key="label">{{ label["labelName"] }}</option>
-            </select>
-            <select v-model="selectedLabelValue">
-                <option disabled selected id="defaultLabelValue">Select Label Value</option>
-                <option v-for="labelValue in getLabelValues" :key="labelValue">{{ labelValue }}</option>
-            </select>
-            <button
-            type="submit"
-            class="btn btn-success"
-            >Submit Label
-            </button>
-        </form>
+        <div v-if="showForm" class="container">
+            
+            <form id="label-form" class="form-inline" @submit.prevent="onSubmit">
+                <div class="form-group m-2">
+                    <label>Add Label:</label>
+                </div>
+                <div class="form-group">
+                    <select v-model="selectedLabelName">
+                        <option disabled selected id="defaultLabelName" :value="''">Select Label</option>
+                        <option v-for="label in allLabels.results" :key="label">{{ label["labelName"] }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select v-model="selectedLabelValue">
+                        <option disabled selected id="defaultLabelValue" :value="''">Select Label Value</option>
+                        <option v-for="labelValue in getLabelValues" :key="labelValue">{{ labelValue }}</option>
+                    </select>
+                </div>
+                <div class="form-group m-2">
+                    <button
+                        type="submit"
+                        class="btn btn-success btn-sm"
+                        >Submit Label
+                    </button>
+                    <button class="btn btn-default m-0 p-0">
+                        <img class="m-2" @click="disableShowForm" id="close" src="https://img.icons8.com/flat-round/64/26e07f/delete-sign.png" />
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -39,7 +59,8 @@ export default {
             questionTopics: [],
             allLabels: [],
             selectedLabelName: "",
-            selectedLabelValue: ""
+            selectedLabelValue: "",
+            showForm: false
         }
     },
     computed: {
@@ -60,6 +81,12 @@ export default {
         }
     },
     methods: {
+        enableShowForm() {
+            this.showForm = true
+        },
+        disableShowForm() {
+            this.showForm = false
+        },
         getLabelsTopics() {
             let endpoint = `/api/questions/${ this.questionId }/labels/`;
               apiService(endpoint)
@@ -85,14 +112,11 @@ export default {
         },
         onSubmit() {
       // Tell the REST API to create a new answer for this question based on the user input, then update some data properties
-            let endpoint = `/api/questions/${this.questionId}/labels/`;
+            let endpoint = `/api/questions/${ this.questionId }/labels/`;
             apiService(endpoint, "POST", {labelName: this.selectedLabelName, labelValue: this.selectedLabelValue})
             this.labelSubmit = false;
             this.selectedLabelName = "";
             this.selectedLabelValue = "";
-    
-            this.questionLabels = [];
-            this.questionTopics = [];
             this.getLabelsTopics();
         }
     },
@@ -103,25 +127,11 @@ export default {
 </script>
 
 <style scoped>
-.label-submit {
-  width: 20%;
-  margin: 0;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 20px;
-}
-
-.label-form-title {
-  margin: 0;
-  margin-left: auto;
-  margin-right: auto;
-  position: relative;
-  left: 50%;
-  display: inline-block;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
 #plus {
+  width: 25px;
+  height: auto;
+}
+#close {
   width: 25px;
   height: auto;
 }
