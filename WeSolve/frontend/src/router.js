@@ -6,7 +6,6 @@ import ProfileView from "./views/Profile.vue";
 import AboutUsView from "./views/AboutUs.vue";
 import ContactUsView from "./views/ContactUs.vue";
 import NotFound from "./views/NotFound.vue";
-import QuestionView from "./views/Question.vue";
 import QuestionEditor from "./views/QuestionEditor.vue";
 
 Vue.use(Router);
@@ -33,13 +32,6 @@ export default new Router({
       path: "/contact",
       name: "contact-us",
       component: ContactUsView
-    },
-    {
-      // with props: true, the slug parameter gets passed as a prop to the component
-      path: "/question/:slug",
-      name: "question",
-      component: QuestionView,
-      props: true
     },
     {
       // the ? sign makes the slug parameter optional

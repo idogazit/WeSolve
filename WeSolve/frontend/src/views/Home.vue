@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <Breadcrumb :crumbs="crumbs" @selected="selected" />
+    <Breadcrumb :crumbs="crumbs" :inQuestion="showChosenQuestion" @selected="selected" />
     <SelectNext v-if="showNav" :links="links" :level="level[crumbs.length]" @selectedLink="selectedLink" />
     <div v-if="showQuestions" class="container mt-2">
       <div v-for="question in questions"
@@ -9,16 +9,17 @@
           <span class="question-author">{{ question.author }}</span>
         </p>
         <h2>
-          <router-link
-            :to="{ name: 'question', params: { slug: question.slug } }"
+          <button
+            @click="chooseQuestion(question.slug)"
             class="question-link"
             >{{ question.content }}
-          </router-link>
+          </button>
         </h2>
         <p>Answers: {{ question.answers_count }}</p>
         <hr>
       </div>
     </div>
+    <QuestionView v-if="showChosenQuestion" :slug="chosenQuestionSlug" />
   </div>
 </template>
 
@@ -26,11 +27,13 @@
 import { apiService } from "@/common/api.service.js";
 import Breadcrumb from "@/components/BreadCrumb.vue";
 import SelectNext from "@/components/SelectNext.vue";
+import QuestionView from "@/components/Question.vue";
 export default {
   name: "HomeView",
   components: {
     Breadcrumb,
-    SelectNext
+    SelectNext,
+    QuestionView
   },
   data() {
     return {
@@ -40,10 +43,19 @@ export default {
       links: [],
       examsId: [],
       showQuestions: false,
-      showNav: true
+      showNav: true,
+      showChosenQuestion: false,
+      chosenQuestionSlug: null,
+      chosenExamIndex: null
     }
   },
   methods: {
+    chooseQuestion(slug) {
+      this.showChosenQuestion = true
+      this.showQuestions = false
+      this.showNav = false
+      this.chosenQuestionSlug = slug
+    },
     getQuestions(examId) {
       this.showQuestions = true
       // make a GET Request to the questions list endpoint and populate the questions array
@@ -63,34 +75,41 @@ export default {
     selected(crumb, ci) {
       this.showNav = true
       this.showQuestions = false
+      this.showChosenQuestion = false
+      this.questions = []
       this.crumbs = this.crumbs.slice(0, ci + 1)
 
       const reqLevel = this.level[this.crumbs.length]
       console.log(reqLevel)
-
-      let endpoint
-      if (this.crumbs.length == 1) {
-        endpoint = "/api/nav/faculties/"
+      if (reqLevel == 'question'){
+        this.showNav = false
+        this.getQuestions(this.examsId[this.chosenExamIndex])
       } else {
-        endpoint = "/api/nav/" + crumb + "/" + this.level[this.crumbs.length] + "s/"
-      }
-      if (reqLevel == 'exam') {
-          apiService(endpoint)
-          .then(data => {
-            this.links = data["results"].map(({ examTime }) => examTime)
-            this.examsId = data["results"].map(({ examId }) => examId)
-          })
+        let endpoint
+        if (this.crumbs.length == 1) {
+          endpoint = "/api/nav/faculties/"
         } else {
-          apiService(endpoint)
-          .then(data => {
-            this.links = data["results"]
-          })
+          endpoint = "/api/nav/" + crumb + "/" + this.level[this.crumbs.length] + "s/"
         }
+        if (reqLevel == 'exam') {
+            apiService(endpoint)
+            .then(data => {
+              this.links = data["results"].map(({ examTime }) => examTime)
+              this.examsId = data["results"].map(({ examId }) => examId)
+            })
+          } else {
+            apiService(endpoint)
+            .then(data => {
+              this.links = data["results"]
+            })
+          }
+      }
     },
     selectedLink(link, linkIndex) {
       const reqLevel = this.level[this.crumbs.length + 1]
       if (reqLevel == 'question'){
         this.showNav = false
+        this.chosenExamIndex = linkIndex
         this.getQuestions(this.examsId[linkIndex])
       } else {
         let endpoint = "/api/nav/" + link + "/" + reqLevel + "s/"
@@ -127,6 +146,9 @@ export default {
 .question-link {
   font-weight: bold;
   color: black;
+  padding: 0;
+  border: none;
+  background: none;
 }
 
 .question-link:hover {

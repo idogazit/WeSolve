@@ -7,7 +7,7 @@
     <div v-if="answer.answerPDF !==null">
       <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="700px" width="100%">
     </div>
-    <div v-if="isAnswerAuthor == false">
+    <div>
       <button
         class="btn btn-sm"
         @click="toggleUpvote"
@@ -15,7 +15,7 @@
           'btn-success': userUpvotedAnswer,
           'btn-outline-success': !userUpvotedAnswer,
           }"
-        :disabled="userDownvotedAnswer"
+        :disabled="userDownvotedAnswer || isAnswerAuthor"
         ><strong>Upvote [{{ upvotesCounter }}]</strong>
       </button>
       <button
@@ -25,7 +25,7 @@
           'btn-danger': userDownvotedAnswer,
           'btn-outline-danger': !userDownvotedAnswer
           }"
-        :disabled="userUpvotedAnswer"
+        :disabled="userUpvotedAnswer || isAnswerAuthor"
         ><strong>Downvote [{{ downvotesCounter }}]</strong>
       </button>
     </div>
