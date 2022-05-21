@@ -1,3 +1,4 @@
+from re import M
 from rest_framework import generics, status, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
@@ -288,9 +289,11 @@ def get_topicset(kwarg_question):
     queryset = QuestionTopic.objects.filter(questionId=kwarg_question)
     output_label_user = CustomUser.objects.get(username="admin")
     new_queryset = getThreeMaxOccurenceTopics(queryset, output_label_user)
-    none_qs = QuestionLabel.objects.none()
-    qs = list(chain(none_qs, new_queryset))
-    return qs
+    none_qs = QuestionTopic.objects.none()
+    if new_queryset:   
+        qs = list(chain(none_qs, new_queryset))
+        return qs
+    return none_qs
 
 def getThreeMaxOccurenceTopics(queryset, output_label_user):
     labels = {}
@@ -342,7 +345,8 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
         serializer_context = {"request": request}
         serializer = self.serializer_class(topicQuest, context=serializer_context)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+
 class SimilarQuestionsAPIView(generics.ListAPIView):
     serializer_class = QuestionSerializer
 
@@ -354,6 +358,82 @@ class SimilarQuestionsAPIView(generics.ListAPIView):
         print(base_labels)
         print("hey")
         print(base_topics)
+
+        questions = Question.objects.exclude(questionId=kwarg_question)\
+                        .only("questionId", "slug")
+
+        distances = {}
+        for q in questions:
+            d = compute_distance(q.questionId, base_labels, base_topics)
+            distances[q.slug] = d
         
-        none_qs = QuestionLabel.objects.none()
-        return none_qs
+        # get top 3 results from dict
+        similar_slugs = sorted(distances, key=distances.get, reverse=False)[:3]
+        
+        return Question.objects.filter(slug=similar_slugs)
+
+
+def compute_label_distance(labels, other_labels):
+    """computes distance between group of labels"""
+
+    diff_val = \
+        labels.get(labelName="Difficulty")\
+            .values("labelValue")["labelValue"]
+    other_diff_val = \
+        other_labels.get(labelName="Difficulty")\
+            .values("labelValue")["labelValue"]
+    
+    diff_d = 2 * abs( int(diff_val) \
+                            - int(other_diff_val) )
+
+    imp_val = \
+        labels.get(labelName="Importance")\
+            .values("labelValue")["labelValue"]
+    other_imp_val = \
+        other_labels.get(labelName="Importance")\
+            .values("labelValue")["labelValue"]
+    
+    imp_d = 2 * abs( int(imp_val) \
+                        - int(other_imp_val) )
+
+    type_val = \
+        labels.get(labelName="Question Type")\
+            .values("labelValue")["labelValue"]
+    other_type_val = \
+        other_labels.get(labelName="Question Type")\
+            .values("labelValue")["labelValue"]
+    
+    type_d = 0 if (type_val == other_type_val) else 5
+    
+    points_val = \
+        labels.get(labelName="Points Precentage")\
+            .values("labelValue")["labelValue"]
+    other_points_val = \
+        other_labels.get(labelName="Points Precentage")\
+            .values("labelValue")["labelValue"]
+    
+    # todo: change this
+    points_d = 0 if (points_val == other_points_val) else 5
+
+    return diff_d + imp_d + type_d + points_d
+
+
+def compute_topic_distance(topics, other_topics):
+    topics_vals = \
+        topics.all().values_list("labelValue")[0]
+    o_topics_val = \
+        other_topics.all().values_list("labelValue")[0]
+    
+    n = len(set(topics_vals).intersection(o_topics_val))
+    m = len(set(topics_vals).union(set(o_topics_val)))
+
+    return (1 - n / m) * 10
+
+
+
+def compute_distance(other_question, labels, topics):
+    other_labels = get_labelset(other_question)
+    other_topics = get_topicset(other_question)
+    a = compute_label_distance(labels, other_labels)
+    b = compute_topic_distance(topics, other_topics)
+    return a + b
