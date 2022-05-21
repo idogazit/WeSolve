@@ -19,7 +19,7 @@
         <p class="answer-added">You've written an answer!</p>
       </div>
       <div v-else-if="showForm">
-        <form class="card" @submit.prevent="onSubmit">
+        <form class="card" enctype="multipart/form-data" @submit.prevent="onSubmit">
           <div class="card-header px-3">
             Answer the Question
           </div>
@@ -100,7 +100,7 @@ export default {
       userHasAnswered: false,
       showForm: false,
       requestUser: null,
-      answerUploadPDF: null
+      answerPDF: null
     }
   },
   computed: {
@@ -155,17 +155,20 @@ export default {
             }
           })
     },
+    uploadFile(e) {
+      this.answerPDF = e.target.files[0];
+    },
     onSubmit() {
       // Tell the REST API to create a new answer for this question based on the user input, then update some data properties
       let answerData = {};
-      if (!this.newAnswerBody && !this.answerUploadPDF) {
+      if (!this.newAnswerBody && !this.answerPDF) {
         this.error = "You can't send an empty answer!";
       } else {
         if (this.newAnswerBody) {
           answerData.body = this.newAnswerBody;
         }
-        if (this.answerUploadPDF) {
-          answerData.answerPDF = this.answerUploadPDF;
+        if (this.answerPDF) {
+          answerData.answerPDF = this.answerPDF;
         }
         let endpoint = `/api/questions/${this.slug}/answer/`;
         apiService(endpoint, "POST", answerData)
@@ -180,9 +183,6 @@ export default {
         }
       }
       this.getQuestionData();
-    },
-    uploadFile() {
-      this.answerUploadPDF = this.$refs.file.files[0];
     },
     async deleteAnswer(answer) {
       // delete a given answer from the answers array and make a delete request to the REST API

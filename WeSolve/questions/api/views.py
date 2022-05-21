@@ -4,6 +4,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+# from rest_framework.parsers import MultiPartParser, FileUploadParser
 
 from questions.api.permissions import IsAuthorOrReadOnly
 from questions.api.serializers import (AnswerSerializer,
@@ -27,6 +28,32 @@ class AnswerCreateAPIView(generics.CreateAPIView):
     serializer_class = AnswerSerializer
     permission_classes = [IsAuthenticated]
 
+    """
+    parser_classes = (MultiPartParser)
+
+
+    def post(self, request, slug):
+        request_user = self.request.user
+        kwarg_slug = slug
+        kwarg_body = self.request.data.get('body')
+        kwarg_answerPDF = request.FILES
+        print(kwarg_answerPDF)
+        question = get_object_or_404(Question, slug=kwarg_slug)
+
+        if question.answers.filter(author=request_user).exists():
+            raise ValidationError("You have already answered this Question!")
+        
+        answer = Answer.objects.create(question=question,
+                                        author=request_user, 
+                                        body=kwarg_body, 
+                                        answerPDF=kwarg_answerPDF)
+
+        serializer_context = {"request": request}
+        serializer = self.serializer_class(answer, context=serializer_context)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    """
+    
     def perform_create(self, serializer):
         request_user = self.request.user
         kwarg_slug = self.kwargs.get("slug")
@@ -36,7 +63,7 @@ class AnswerCreateAPIView(generics.CreateAPIView):
             raise ValidationError("You have already answered this Question!")
         
         serializer.save(author=request_user, question=question)
-
+    
 
 class AnswerUpvoteAPIView(APIView):
     """Allow users to add/remove a upvotes to/from an answer instance."""
