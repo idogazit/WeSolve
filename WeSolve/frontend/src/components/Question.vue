@@ -10,10 +10,7 @@
         <span class="author-name">{{ question.author }}</span>
       </p>
       <p>{{ question.created_at }}</p>
-      <ul class="list-group list-group-horizontal-sm">
-        <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="topic in questionTopics.results" :key="topic"><span class="badge badge-danger">{{ topic["topicName"] }}</span></li>
-        <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="label in questionLabels.results" :key="label"><span class="badge badge-warning">{{ label["labelName"] }}: {{ label["labelValue"] }}</span></li>
-      </ul>
+      <LabelsTopics :questionId="question.questionId" />
       <p>
         <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="100%">
       </p>
@@ -35,7 +32,8 @@
             ></textarea>
           </div>
           <div class="card-footer px-3">
-            <button type="submit" class="btn btn-sm btn-success">Submit Your Answer</button>
+            <input class="upload-pdf" type="file" name="upload" accept="application/pdf" @change="uploadFile"/>
+            <button type="submit" class="btn btn-sm btn-success submit-ans">Submit Your Answer</button>
           </div>
         </form>
         <p v-if="error" class="error mt-2">{{ error }}</p>
@@ -77,6 +75,7 @@
 import { apiService } from "@/common/api.service.js";
 import AnswerComponent from "@/components/Answer.vue";
 import QuestionActions from "@/components/QuestionActions.vue";
+import LabelsTopics from "@/components/LabelsTopics.vue";
 export default {
   name: "QuestionView",
   props: {
@@ -87,7 +86,8 @@ export default {
   },
   components: {
     AnswerComponent,
-    QuestionActions
+    QuestionActions,
+    LabelsTopics
   },
   data() {
     return {
@@ -100,8 +100,7 @@ export default {
       userHasAnswered: false,
       showForm: false,
       requestUser: null,
-      questionLabels: [],
-      questionTopics: [],
+      answerUploadPDF: null
     }
   },
   computed: {
@@ -112,7 +111,7 @@ export default {
     getQuestionPDF() {
       var pdf_name = this.question["questionPDF"].split('/')[(this.question["questionPDF"].split('/')).length - 1];
       return "../../../questions/uploads/questionsPDF/".concat(pdf_name).concat("/");
-    },
+    }
   },
   methods: {
     setPageTitle(title) {
@@ -127,30 +126,16 @@ export default {
       // get the details of a question instance from the REST API and call setPageTitle
       let endpoint = `/api/questions/${this.slug}/`;
       apiService(endpoint)
-        .then(data => {
-          if (data) {
-            this.question = data;
-            endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
-            apiService(endpoint)
-              .then(data => {
-                if (data) {
-                  this.questionLabels = data;
-                }
-              })
-            endpoint = `/api/questions/${this.question["questionId"]}/topics/`;
-            apiService(endpoint)
-              .then(data => {
-                if (data) {
-                  this.questionTopics = data;
-                }
-              })
-            this.userHasAnswered = data.user_has_answered;
-            this.setPageTitle(data.content)
-          } else {
-            this.question = null;
-            this.setPageTitle("404 - Page Not Found")
-          }
-        })
+          .then(data => {
+            if (data) {
+              this.question = data;
+              this.userHasAnswered = data.user_has_answered;
+              this.setPageTitle(data.content)
+            } else {
+              this.question = null;
+              this.setPageTitle("404 - Page Not Found")
+            }
+          })
     },
     getQuestionAnswers() {
       // get a page of answers for a single question from the REST API's paginated 'Questions Endpoint'
@@ -160,42 +145,44 @@ export default {
       }
       this.loadingAnswers = true;
       apiService(endpoint)
-        .then(data => {
-          this.answers.push(...data.results);
-          this.loadingAnswers = false;
-          if (data.next) {
-            this.next = data.next;
-          } else {
-            this.next = null;
-          }
-        })
-    },
-    getQuestionLabels() {
-      let endpoint = `/api/questions/${this.question["questionId"]}/labels/`;
-      apiService(endpoint)
-        .then(data => {
-          if (data) {
-            this.questionLabels = data;
-          }
-        })
+          .then(data => {
+            this.answers.push(...data.results);
+            this.loadingAnswers = false;
+            if (data.next) {
+              this.next = data.next;
+            } else {
+              this.next = null;
+            }
+          })
     },
     onSubmit() {
       // Tell the REST API to create a new answer for this question based on the user input, then update some data properties
-      if (this.newAnswerBody) {
+      let answerData = {};
+      if (!this.newAnswerBody && !this.answerUploadPDF) {
+        this.error = "You can't send an empty answer!";
+      } else {
+        if (this.newAnswerBody) {
+          answerData.body = this.newAnswerBody;
+        }
+        if (this.answerUploadPDF) {
+          answerData.answerPDF = this.answerUploadPDF;
+        }
         let endpoint = `/api/questions/${this.slug}/answer/`;
-        apiService(endpoint, "POST", { body: this.newAnswerBody })
-          .then(data => {
-            this.answers.unshift(data)
-          })
+        apiService(endpoint, "POST", answerData)
+            .then(data => {
+              this.answers.unshift(data)
+            })
         this.newAnswerBody = null;
         this.showForm = false;
         this.userHasAnswered = true;
         if (this.error) {
           this.error = null;
         }
-      } else {
-        this.error = "You can't send an empty answer!";
       }
+      this.getQuestionData();
+    },
+    uploadFile() {
+      this.answerUploadPDF = this.$refs.file.files[0];
     },
     async deleteAnswer(answer) {
       // delete a given answer from the answers array and make a delete request to the REST API
@@ -232,5 +219,10 @@ export default {
 .error {
   font-weight: bold;
   color: red; 
+}
+
+.submit-ans {
+  margin-top: 10px;
+  display: block;
 }
 </style>

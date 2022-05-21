@@ -5,7 +5,7 @@
     </p>
     <p>{{ answer.body }}</p>
     <div v-if="answer.answerPDF !==null">
-      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="700px" width="80%">
+      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="700px" width="100%">
     </div>
     <div>
       <button

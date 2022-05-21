@@ -44,10 +44,5 @@ export default {
 </script>
 
 <style scoped>
-.breadcrumb {
-    background-color: white;
-    border: 1px solid rgba(0,0,0,0.125);
-    border-radius: 0.37rem;
-}
 
 </style>
