@@ -188,8 +188,11 @@ class QuestionLabelListAPIView(generics.ListCreateAPIView):
             label_list.append(importance_label)
         
         none_qs = QuestionLabel.objects.none()
-        qs = list(chain(none_qs, label_list))
 
+        if label_list:
+            qs = list(chain(none_qs, label_list))
+        else:
+            qs = none_qs
 
         return qs
     
@@ -279,8 +282,11 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
         kwarg_question = self.kwargs.get("questionId")
         queryset = QuestionTopic.objects.filter(questionId=kwarg_question)
         new_queryset = self.getThreeMaxOccurenceTopics(queryset)
-        none_qs = QuestionLabel.objects.none()
-        qs = list(chain(none_qs, new_queryset))
+        none_qs = QuestionTopic.objects.none()
+        if new_queryset:
+            qs = new_queryset
+        else:
+            qs = none_qs
         return qs
 
     def getThreeMaxOccurenceTopics(self, queryset):
