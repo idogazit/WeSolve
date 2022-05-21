@@ -47,5 +47,10 @@ urlpatterns = [
 
      path("questions/<str:questionId>/topics/",
           qv.QuestionTopicAPIView.as_view(),
-          name="topics-get-create")
+          name="topics-get-create"),
+     
+     path("questions/<str:question>/similar/",
+          qv.SimilarQuestionsAPIView.as_view(),
+          name="similar-questions")
+     
 ]
