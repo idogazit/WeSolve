@@ -71,6 +71,7 @@ class CustomUser(AbstractUser):
     rank = models.IntegerField(choices=Rank.choices, default=Rank.FRESHMAN)
     userPic = models.ImageField(upload_to=upload_location, default="users/uploads/userPics/default_userPic.png")
     isTeacher = models.BooleanField(default=False)
+    # rank_score = models.IntegerField(default=0)
 
     def __str__(self):
         return self.username
