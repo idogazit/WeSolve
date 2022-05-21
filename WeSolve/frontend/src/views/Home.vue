@@ -52,6 +52,92 @@ export default {
       chosenExamIndex: null
     }
   },
+  mounted() {
+    if (localStorage.questions) {
+      this.questions = JSON.parse(localStorage.questions);
+    }
+    if (localStorage.crumbs) {
+      this.crumbs = JSON.parse(localStorage.crumbs);
+    }
+    if (localStorage.links) {
+      this.links = JSON.parse(localStorage.links);
+    }
+    if (localStorage.examsId) {
+      this.examsId = JSON.parse(localStorage.examsId);
+    }
+    
+    if (localStorage.showQuestions) {
+      this.showQuestions = JSON.parse(localStorage.showQuestions);
+    }
+    if (localStorage.showNav) {
+      this.showNav = JSON.parse(localStorage.showNav);
+    }
+    if (localStorage.showChosenQuestion) {
+      this.showChosenQuestion = JSON.parse(localStorage.showChosenQuestion);
+    }
+    if (localStorage.chosenQuestionSlug) {
+      this.chosenQuestionSlug = JSON.parse(localStorage.chosenQuestionSlug);
+    }
+    if (localStorage.chosenExamIndex) {
+      this.chosenExamIndex = JSON.parse(localStorage.chosenExamIndex);
+    }
+
+    if (this.crumbs.length === 1) {
+      this.loadUpTAU()
+    }
+  },
+  watch: {
+    questions: {
+      handler(newQuestions){
+        localStorage.questions = JSON.stringify(newQuestions);
+      },
+      deep: true
+    },
+    crumbs: {
+      handler(newCrumbs){
+        localStorage.crumbs = JSON.stringify(newCrumbs);
+      },
+      deep: true
+    },
+    links: {
+      handler(newLinks){
+        localStorage.links = JSON.stringify(newLinks);
+      },
+      deep: true
+    },
+    examsId: {
+      handler(newExamsId){
+        localStorage.examsId = JSON.stringify(newExamsId);
+      },
+      deep: true
+    },
+
+    showQuestions: {
+      handler(newShowQuestions){
+        localStorage.showQuestions = JSON.stringify(newShowQuestions);
+      }
+    },
+    showNav: {
+      handler(newShowNav){
+        localStorage.showNav = JSON.stringify(newShowNav);
+      }
+    },
+    showChosenQuestion: {
+      handler(newShowChosenQuestion){
+        localStorage.showChosenQuestion = JSON.stringify(newShowChosenQuestion);
+      }
+    },
+    chosenQuestionSlug: {
+      handler(newChosenQuestionSlug){
+        localStorage.chosenQuestionSlug = JSON.stringify(newChosenQuestionSlug);
+      }
+    },
+    chosenExamIndex: {
+      handler(newChosenExamIndex){
+        localStorage.chosenExamIndex = JSON.stringify(newChosenExamIndex);
+      }
+    },
+  },
   methods: {
     chooseQuestion(slug) {
       this.showChosenQuestion = true
@@ -79,6 +165,7 @@ export default {
       this.showNav = true
       this.showQuestions = false
       this.showChosenQuestion = false
+      this.chosenQuestionSlug = null
       this.questions = []
       this.crumbs = this.crumbs.slice(0, ci + 1)
 
@@ -135,7 +222,9 @@ export default {
   created() {
     //this.getQuestions()
     document.title = "WeSolve";
-    this.loadUpTAU()
+  },
+  beforeDestroy() {
+    localStorage.clear()
   }
 };
 </script>

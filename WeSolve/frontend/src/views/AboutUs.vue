@@ -28,6 +28,12 @@
         </p>
         <hr>
       </div>
+      <router-link
+              :to="{ name: 'search' }" 
+              class="btn btn-lg btn-info"
+              type="button"
+              >Get Started!
+      </router-link>
     </div>
   </div>
 </template>
