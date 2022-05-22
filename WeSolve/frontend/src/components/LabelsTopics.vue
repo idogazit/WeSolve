@@ -12,8 +12,27 @@
             </li>
         </ul>
         <div v-if="showForm" class="container">
-            
-            <form id="label-form" class="form-inline" @submit.prevent="onSubmit">
+
+            <form id="topic-form" class="form-inline" @submit.prevent="onTopicSubmit">
+                <div class="form-group m-2">
+                    <label>Add Topic:</label>
+                </div>
+                <div class="form-group">
+                  <input type="text" v-model="selectedTopicName">
+                </div>
+                <div class="form-group m-2">
+                    <button
+                        type="submit"
+                        class="btn btn-success btn-sm"
+                        >Submit Topic
+                    </button>
+                    <button class="btn btn-default m-0 p-0">
+                        <img class="m-2" @click="disableShowForm" id="close2" src="https://img.icons8.com/flat-round/64/26e07f/delete-sign.png" />
+                    </button>
+                </div>
+            </form>
+
+            <form id="label-form" class="form-inline" @submit.prevent="onLabelSubmit">
                 <div class="form-group m-2">
                     <label>Add Label:</label>
                 </div>
@@ -40,6 +59,7 @@
                     </button>
                 </div>
             </form>
+
         </div>
     </div>
 </template>
@@ -55,12 +75,14 @@ export default {
     },
     data() {
         return {
-            questionLabels: [],
-            questionTopics: [],
-            allLabels: [],
-            selectedLabelName: "",
-            selectedLabelValue: "",
-            showForm: false
+          questionLabels: [],
+          questionTopics: [],
+          allLabels: [],
+          allTopics: [],
+          selectedLabelName: "",
+          selectedLabelValue: "",
+          selectedTopicName: "",
+          showForm: false
         }
     },
     computed: {
@@ -109,16 +131,43 @@ export default {
                       this.allLabels = data;
                     }
                   })
+              endpoint = `/api/topics/`;
+              apiService(endpoint)
+                  .then(data => {
+                    if (data) {
+                      this.allTopics = data;
+                    }
+                  })
         },
-        onSubmit() {
-      // Tell the REST API to create a new answer for this question based on the user input, then update some data properties
-            let endpoint = `/api/questions/${ this.questionId }/labels/`;
-            apiService(endpoint, "POST", {labelName: this.selectedLabelName, labelValue: this.selectedLabelValue})
-            this.labelSubmit = false;
-            this.selectedLabelName = "";
-            this.selectedLabelValue = "";
-            this.getLabelsTopics();
-        }
+        onLabelSubmit() {
+          let endpoint = `/api/questions/${ this.questionId }/labels/`;
+          apiService(endpoint, "POST", {labelName: this.selectedLabelName, labelValue: this.selectedLabelValue})
+          this.selectedLabelName = "";
+          this.selectedLabelValue = "";
+          this.getLabelsTopics();
+          location.reload();
+        },
+        onTopicSubmit() {
+            if (this.selectedTopicName) {
+              this.selectedTopicName = this.selectedTopicName.toLowerCase();
+              let endpoint = `/api/questions/${ this.questionId }/topics/`;
+              apiService(endpoint, "POST", {topicName: this.selectedTopicName})
+              this.selectedTopicName = "";
+              this.getLabelsTopics();
+              location.reload();
+            }
+        },
+        isTopicExists(topicName) {
+          if (!this.allTopics) {
+            return false;
+          }
+          this.allTopics.results.forEach((result) => {
+              if (result.topicName === topicName) {
+                return true;
+              }
+          });
+          return false;
+        },
     },
     created() {
         this.getLabelsTopics();
@@ -135,4 +184,10 @@ export default {
   width: 25px;
   height: auto;
 }
+
+#close2 {
+  width: 25px;
+  height: auto;
+}
+
 </style>
