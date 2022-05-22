@@ -17,6 +17,7 @@ class UserDisplaySerializer(serializers.ModelSerializer):
             "rank",
             "userPic",
             "isTeacher",
+            "rankScore",
             "courses"
             ]
 
