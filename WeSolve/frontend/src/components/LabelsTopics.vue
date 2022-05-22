@@ -149,13 +149,8 @@ export default {
         },
         onTopicSubmit() {
             if (this.selectedTopicName) {
-              //this.selectedTopicName = this.selectedTopicName.toLowerCase();
-              let endpoint = ``;
-              // if (!this.isTopicExists(this.selectedTopicName)) {
-              //   endpoint = `/api/topics/`;
-              //   apiService(endpoint, "POST", {topicName: this.selectedTopicName})
-              // }
-              endpoint = `/api/questions/${ this.questionId }/topics/`;
+              this.selectedTopicName = this.selectedTopicName.toLowerCase();
+              let endpoint = `/api/questions/${ this.questionId }/topics/`;
               apiService(endpoint, "POST", {topicName: this.selectedTopicName})
               this.selectedTopicName = "";
               this.getLabelsTopics();
