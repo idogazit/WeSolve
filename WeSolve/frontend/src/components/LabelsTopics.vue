@@ -145,6 +145,7 @@ export default {
           this.selectedLabelName = "";
           this.selectedLabelValue = "";
           this.getLabelsTopics();
+          location.reload();
         },
         onTopicSubmit() {
             if (this.selectedTopicName) {
@@ -158,6 +159,7 @@ export default {
               apiService(endpoint, "POST", {topicName: this.selectedTopicName})
               this.selectedTopicName = "";
               this.getLabelsTopics();
+              location.reload();
             }
         },
         isTopicExists(topicName) {
