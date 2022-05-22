@@ -148,7 +148,7 @@ export default {
         },
         onTopicSubmit() {
             if (this.selectedTopicName) {
-              this.selectedTopicName = this.selectedTopicName.toLowerCase();
+              //this.selectedTopicName = this.selectedTopicName.toLowerCase();
               let endpoint = ``;
               // if (!this.isTopicExists(this.selectedTopicName)) {
               //   endpoint = `/api/topics/`;
