@@ -224,7 +224,6 @@ def get_labelset(kwarg_question):
     none_qs = QuestionLabel.objects.none()
     qs = list(chain(none_qs, label_list))
 
-
     return qs
 
 def getAverageNumericLabel(queryset, output_label_user):
@@ -357,9 +356,15 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
     def post(self, request, questionId):
         """Add the request.user's given topic for a question.
           Create atopicQuestions instance."""
+          
         user = request.user
         question = get_object_or_404(Question, questionId=questionId)
-        topic = get_object_or_404(Topic, topicName=request.data.get('topicName'))
+        topicName = str.lower(request.data.get('topicName'))
+
+        if not Topic.objects.filter(topicName=topicName):
+            Topic.objects.create(topicName=topicName)
+
+        topic = get_object_or_404(Topic, topicName=topicName)
 
         if QuestionTopic.objects.filter(questionId=question, labeledByUser=user, topicName=topic).exists():
             raise ValidationError("You have already gave this topic to this Question!")
@@ -370,6 +375,7 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
         serializer = self.serializer_class(topicQuest, context=serializer_context)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+
 class SimilarQuestionsAPIView(generics.ListAPIView):
     serializer_class = QuestionSerializer
 
