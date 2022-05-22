@@ -38,6 +38,7 @@ export default {
       userPic: "",
       userIsTeacher: false,
       userCourses: null,
+      userRankScore: 0,
       rankMap: {
         0 : "Freshman",
         1 : "Junior",
@@ -56,6 +57,7 @@ export default {
           var pic_name = data["userPic"].split('/')[data["userPic"].split('/').length - 1]
           this.userPic = require("../../../users/uploads/userPics/".concat(pic_name));
           this.userIsTeacher = data["isTeacher"];
+          this.userRankScore = data["rankScore"];
           this.userCourses = data["courses"];
         })
     }
