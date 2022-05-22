@@ -14,9 +14,9 @@ export default new Router({
   mode: "history",
   routes: [
     {
-      path: "/",
-      name: "home",
-      component: HomeView
+      path: "/search",
+      name: "search",
+      component: HomeView,
     },
     {
       path: "/profile",
@@ -24,9 +24,13 @@ export default new Router({
       component: ProfileView
     },
     {
-      path: "/about",
+      path: "/",
       name: "about-us",
-      component: AboutUsView
+      component: AboutUsView,
+      beforeEnter: (to, from, next) => {
+        localStorage.clear();
+        next();
+      }
     },
     {
       path: "/contact",

@@ -22,6 +22,14 @@ from itertools import chain
 from collections import Counter
 
 
+# SELF_VOTE_SCORE = 1
+# UPVOTE_SCORE = 2
+# DOWNVOTE_SCORE = -2
+# ANSWER_SCORE = 10
+# ADDED_LABEL_SCORE = 3
+# ADDED_TOPIC_SCORE = 3
+
+
 class AnswerCreateAPIView(generics.CreateAPIView):
     """Allow users to answer a question instance if they haven't already."""
     queryset = Answer.objects.all()
@@ -89,18 +97,23 @@ class AnswerUpvoteAPIView(APIView):
         """Add request.user to the upvoters queryset of an answer instance."""
         answer = get_object_or_404(Answer, answerId=answerId)
         user = request.user
-
-        print(user)
-        print(answer.downvoters)
+        author = answer.author
 
         if user in answer.downvoters.all():
             answer.downvoters.remove(user)
             answer.ranking += 1
+            # user.rank_score -= SELF_VOTE_SCORE
+            # author.rank_score -= DOWNVOTE_SCORE
         
         print("success")
         answer.upvoters.add(user)
         answer.ranking += 1
         answer.save()
+
+        # user.rank_score += SELF_VOTE_SCORE
+        # author.rank_score += UPVOTE_SCORE
+        user.save()
+        author.save()
 
         serializer_context = {"request": request}
         serializer = self.serializer_class(answer, context=serializer_context)
@@ -184,6 +197,70 @@ class QuestionListAPIView(generics.ListAPIView):
         kwarg_exam = self.kwargs.get("exam")
         return Question.objects.filter(examUniqueName=kwarg_exam)
 
+def get_labelset(kwarg_question):
+    output_label_user = CustomUser.objects.get(username="admin")
+    queryset = QuestionLabel.objects.filter(questionId=kwarg_question)
+    diff_query = queryset.filter(labelName='Difficulty')
+    type_query = queryset.filter(labelName='Question Type')
+    precent_query = queryset.filter(labelName='Points Percentage')
+    importance_query = queryset.filter(labelName='Importance')
+
+    diff_label = getAverageNumericLabel(diff_query, output_label_user)
+    type_label = getMaxOccurenceLabel(type_query, output_label_user)
+    precent_label = getMaxOccurenceLabel(precent_query, output_label_user)
+    importance_label = getAverageNumericLabel(importance_query, output_label_user)
+
+    label_list = []
+
+    if diff_label:
+        label_list.append(diff_label)
+    if type_label:
+        label_list.append(type_label)
+    if precent_label:
+        label_list.append(precent_label)
+    if importance_label:
+        label_list.append(importance_label)
+    
+    none_qs = QuestionLabel.objects.none()
+    qs = list(chain(none_qs, label_list))
+
+
+    return qs
+
+def getAverageNumericLabel(queryset, output_label_user):
+    avg = 0
+    count = queryset.count()
+    if count == 0:
+        return None # may need to change
+    for user_rank in queryset:
+        avg += int(user_rank.labelValue)
+    avg = avg / count
+    avg = "{:.2f}".format(avg)
+    ans = QuestionLabel(questionId=queryset[0].questionId,
+                        labeledByUser=output_label_user,
+                        labelName=queryset[0].labelName,
+                        labelValue=str(avg))
+    return ans
+
+def getMaxOccurenceLabel(queryset, output_label_user):
+    labels = {}
+    count = queryset.count()
+    if count == 0:
+        return None # may need to change
+    for user_label in queryset:
+        l = user_label.labelValue
+        if l in labels:
+            labels[l] += 1
+        else:
+            labels[l] = 1
+    final_label = max(labels, key=labels.get)
+    ans = QuestionLabel(questionId=queryset[0].questionId,
+                        labeledByUser=output_label_user,
+                        labelName=queryset[0].labelName,
+                        labelValue=final_label)
+    return ans
+
+
 
 class QuestionLabelListAPIView(generics.ListCreateAPIView):
     serializer_class = QuestionLabelSerializer
@@ -192,69 +269,7 @@ class QuestionLabelListAPIView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         kwarg_question = self.kwargs.get("question")
-        queryset = QuestionLabel.objects.filter(questionId=kwarg_question)
-        diff_query = queryset.filter(labelName='Difficulty')
-        type_query = queryset.filter(labelName='Question Type')
-        precent_query = queryset.filter(labelName='Points Percentage')
-        importance_query = queryset.filter(labelName='Importance')
-
-        diff_label = self.getAverageNumericLabel(diff_query)
-        type_label = self.getMaxOccurenceLabel(type_query)
-        precent_label = self.getMaxOccurenceLabel(precent_query)
-        importance_label = self.getAverageNumericLabel(importance_query)
-
-        label_list = []
-
-        if diff_label:
-            label_list.append(diff_label)
-        if type_label:
-            label_list.append(type_label)
-        if precent_label:
-            label_list.append(precent_label)
-        if importance_label:
-            label_list.append(importance_label)
-        
-        none_qs = QuestionLabel.objects.none()
-
-        if label_list:
-            qs = list(chain(none_qs, label_list))
-        else:
-            qs = none_qs
-
-        return qs
-    
-    def getAverageNumericLabel(self, queryset):
-        avg = 0
-        count = queryset.count()
-        if count == 0:
-            return None # may need to change
-        for user_rank in queryset:
-            avg += int(user_rank.labelValue)
-        avg = avg / count
-        avg = "{:.2f}".format(avg)
-        ans = QuestionLabel(questionId=queryset[0].questionId,
-                            labeledByUser=self.output_label_user,
-                            labelName=queryset[0].labelName,
-                            labelValue=str(avg))
-        return ans
-    
-    def getMaxOccurenceLabel(self, queryset):
-        labels = {}
-        count = queryset.count()
-        if count == 0:
-            return None # may need to change
-        for user_label in queryset:
-            l = user_label.labelValue
-            if l in labels:
-                labels[l] += 1
-            else:
-                labels[l] = 1
-        final_label = max(labels, key=labels.get)
-        ans = QuestionLabel(questionId=queryset[0].questionId,
-                            labeledByUser=self.output_label_user,
-                            labelName=queryset[0].labelName,
-                            labelValue=final_label)
-        return ans
+        return get_labelset(kwarg_question)
     
     def post(self, request, question):
         questionObject = get_object_or_404(Question, questionId=question)
@@ -295,6 +310,35 @@ class LabelListAPIView(generics.ListAPIView):
     queryset = Label.objects.all()
 
 
+def get_topicset(kwarg_question):
+    """List all given topics records for a question"""
+    queryset = QuestionTopic.objects.filter(questionId=kwarg_question)
+    output_label_user = CustomUser.objects.get(username="admin")
+    new_queryset = getThreeMaxOccurenceTopics(queryset, output_label_user)
+    none_qs = QuestionLabel.objects.none()
+    qs = list(chain(none_qs, new_queryset))
+    return qs
+
+def getThreeMaxOccurenceTopics(queryset, output_label_user):
+    labels = {}
+    count = len(queryset)
+    if count == 0:
+        return None # may need to change
+    for user_topic in queryset:
+        l = user_topic.topicName
+        if l in labels:
+            labels[l] += 1
+        else:
+            labels[l] = 1
+    final_topics = [k for k,v in Counter(labels).most_common(3)]
+    new_queryset = []
+    for topic in final_topics:
+        ans = QuestionTopic(questionId=queryset[0].questionId,
+                            labeledByUser=output_label_user,
+                            topicName=topic)
+        new_queryset.append(ans)
+    return new_queryset  
+
 class QuestionTopicAPIView(generics.ListCreateAPIView):
     """
     Concrete view for listing a topicQuestions or creating a topicQuestion instance.
@@ -307,34 +351,8 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
     def get_queryset(self):
         """List all given topics records for a question"""
         kwarg_question = self.kwargs.get("questionId")
-        queryset = QuestionTopic.objects.filter(questionId=kwarg_question)
-        new_queryset = self.getThreeMaxOccurenceTopics(queryset)
-        none_qs = QuestionTopic.objects.none()
-        if new_queryset:
-            qs = new_queryset
-        else:
-            qs = none_qs
-        return qs
+        return get_topicset(kwarg_question)
 
-    def getThreeMaxOccurenceTopics(self, queryset):
-        labels = {}
-        count = len(queryset)
-        if count == 0:
-            return None # may need to change
-        for user_topic in queryset:
-            l = user_topic.topicName
-            if l in labels:
-                labels[l] += 1
-            else:
-                labels[l] = 1
-        final_topics = [k for k,v in Counter(labels).most_common(3)]
-        new_queryset = []
-        for topic in final_topics:
-            ans = QuestionTopic(questionId=queryset[0].questionId,
-                                labeledByUser=self.output_label_user,
-                                topicName=topic)
-            new_queryset.append(ans)
-        return new_queryset  
     
     def post(self, request, questionId):
         """Add the request.user's given topic for a question.
@@ -352,12 +370,17 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
         serializer = self.serializer_class(topicQuest, context=serializer_context)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    class SimilarQuestionsAPIView(generics.ListAPIView):
-        serializer_class = QuestionSerializer
+class SimilarQuestionsAPIView(generics.ListAPIView):
+    serializer_class = QuestionSerializer
 
-        def get_queryset(self):
-            kwarg_question = self.kwargs.get("questionId")
-            base_question = QuestionTopic.objects.get(questionId=kwarg_question)
-            
-            none_qs = QuestionLabel.objects.none()
-            return none_qs
+    def get_queryset(self):
+        kwarg_question = self.kwargs.get("question")
+        base_labels = get_labelset(kwarg_question)
+        base_topics = get_topicset(kwarg_question)
+
+        print(base_labels)
+        print("hey")
+        print(base_topics)
+        
+        none_qs = QuestionLabel.objects.none()
+        return none_qs

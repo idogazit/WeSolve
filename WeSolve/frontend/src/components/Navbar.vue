@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light my-navbar">
     <div class="container">
       <router-link 
-        :to="{ name: 'home' }" 
+        :to="{ name: 'about-us' }" 
         class="navbar-brand"
         >WeSolve
       </router-link>
@@ -11,9 +11,9 @@
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active">
             <router-link
-              :to="{ name: 'home' }" 
-              class="btn btn-sm btn-success"
-              >Home
+              :to="{ name: 'search' }" 
+              class="btn btn-sm btn-info"
+              >Search
             </router-link>
           </li>
           <li class="nav-item active">
