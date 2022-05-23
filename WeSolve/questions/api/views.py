@@ -71,6 +71,10 @@ class AnswerCreateAPIView(generics.CreateAPIView):
         if question.answers.filter(author=request_user).exists():
             raise ValidationError("You have already answered this Question!")
         
+        request_user.rankScore += ANSWER_SCORE
+        set_user_rank(request_user)
+        request_user.save()
+        
         serializer.save(author=request_user, question=question)
     
 
@@ -321,6 +325,10 @@ class QuestionLabelListAPIView(generics.ListCreateAPIView):
                                                      labeledByUser=user, 
                                                      labelName=label, 
                                                      labelValue=value)
+        
+        user.rankScore += ADDED_LABEL_SCORE
+        set_user_rank(user)
+        user.save()
 
         serializer_context = {"request": request}
         serializer = self.serializer_class(labelQuest, context=serializer_context)
@@ -406,6 +414,10 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
             raise ValidationError("You have already gave this topic to this Question!")
 
         topicQuest = QuestionTopic.objects.create(questionId=question, labeledByUser=user, topicName=topic)
+
+        user.rankScore += ADDED_TOPIC_SCORE
+        set_user_rank(user)
+        user.save()
 
         serializer_context = {"request": request}
         serializer = self.serializer_class(topicQuest, context=serializer_context)
