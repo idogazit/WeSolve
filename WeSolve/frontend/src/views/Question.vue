@@ -81,10 +81,7 @@ import SimilarQuestions from "@/components/SimilarQuestions.vue";
 export default {
   name: "QuestionView",
   props: {
-    slug: {
-      type: String,
-      required: true
-    },
+
   },
   components: {
     AnswerComponent,
@@ -94,6 +91,7 @@ export default {
   },
   data() {
     return {
+      slug: this.$route.params.slug,
       question: {},
       answers: [],
       next: null,

@@ -3,28 +3,30 @@
         <div class="container">
             <h1 class="mb-3">Similar Questions:</h1>
             <div v-for="question in questions"
-            :key="question.pk">
-            <p class="mb-0">Posted by:
-            <span class="question-author">{{ question.author }}</span>
-            </p>
-            <h2>
-            <button
-                @click="chooseQuestion(question.slug)"
-                class="question-link"
-                >{{ question.content }}
-            </button>
-            </h2>
-            <p>Answers: {{ question.answers_count }}</p>
-            <hr>
+                :key="question.pk">
+                <p class="mb-0">Posted by:
+                    <span class="question-author">{{ question.author }}</span>
+                </p>
+                <h2>
+                <router-link :to="{ name: 'question',  params: {slug: question.slug} }" >
+                    <button
+                        class="question-link"
+                        >{{ question.content }}
+                    </button>
+                </router-link>
+                </h2>
+                <p>Answers: {{ question.answers_count }}</p>
+                <hr>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { apiService } from "@/common/api.service.js";
 export default {
     props: {
-        questionSlug: {
+        questionId: {
             type: String,
             required: true
         }
@@ -37,18 +39,14 @@ export default {
     methods: {
         getSimilarQuestion() {
             // need to get the similar questions by the selected question slug
-            console.log(this.questionSlug)
-            this.questions = [
-                {
-                    author: "ido gazit",
-                    slug: "00000",
-                    content: "best question",
-                    answers_count: 20
-                }
-            ]
-        },
-        chooseQuestion(slug) {
-            console.log(slug)
+            console.log(this.questionId)
+            let endpoint = `/api/questions/${ this.questionId }/similar/`;
+              apiService(endpoint)
+                  .then(data => {
+                    if (data) {
+                      this.questions = data.results;
+                    }
+                  })
         }
     },
     created() {

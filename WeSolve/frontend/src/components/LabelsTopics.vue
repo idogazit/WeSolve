@@ -1,14 +1,12 @@
 <template>
-    <div>
+    <div class="bg-transparent">
         <ul class="list-group list-group-horizontal-sm">
-            <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="topic in getTopics" :key="topic"><span class="badge badge-danger">{{ topic["topicName"] }}</span></li>
-            <li class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="label in getLabels" :key="label"><span class="badge badge-warning">{{ label["labelName"] }}: {{ label["labelValue"] }}</span></li>
-            <li v-if="showForm == false" class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3">
+            <li class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="topic in getTopics" :key="topic"><span class="badge badge-danger">{{ topic["topicName"] }}</span></li>
+            <li class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="label in getLabels" :key="label"><span class="badge badge-warning">{{ label["labelName"] }}: {{ label["labelValue"] }}</span></li>
+            <li v-if="showForm == false" class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3">
                 <button class="btn btn-default m-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Add Label">
                     <img @click="enableShowForm" id="plus" src="https://img.icons8.com/external-tanah-basah-glyph-tanah-basah/48/26e07f/external-plus-essentials-tanah-basah-glyph-tanah-basah-2.png" />
                 </button>
-            </li>
-            <li  class="list-group-item border-0 .flex-fill pr-1 pl-1 pd-3">
             </li>
         </ul>
         <div v-if="showForm" class="container">
@@ -176,6 +174,9 @@ export default {
 </script>
 
 <style scoped>
+body {
+    opacity: 0;
+}
 #plus {
   width: 25px;
   height: auto;

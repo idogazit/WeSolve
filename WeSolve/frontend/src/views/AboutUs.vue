@@ -30,7 +30,7 @@
       </div>
       <router-link
               :to="{ name: 'search' }" 
-              class="btn btn-lg btn-info"
+              class="btn btn-lg btn-info mb-3"
               type="button"
               >Get Started!
       </router-link>
