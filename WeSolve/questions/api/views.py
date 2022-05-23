@@ -23,12 +23,12 @@ from itertools import chain
 from collections import Counter
 
 
-# SELF_VOTE_SCORE = 1
-# UPVOTE_SCORE = 2
-# DOWNVOTE_SCORE = -2
-# ANSWER_SCORE = 10
-# ADDED_LABEL_SCORE = 3
-# ADDED_TOPIC_SCORE = 3
+SELF_VOTE_SCORE = 1
+UPVOTE_SCORE = 2
+DOWNVOTE_SCORE = -2
+ANSWER_SCORE = 10
+ADDED_LABEL_SCORE = 3
+ADDED_TOPIC_SCORE = 3
 
 
 class AnswerCreateAPIView(generics.CreateAPIView):
@@ -74,6 +74,16 @@ class AnswerCreateAPIView(generics.CreateAPIView):
         serializer.save(author=request_user, question=question)
     
 
+def set_user_rank(user):
+    if user.rankScore >= 300:
+        user.rank = CustomUser.Rank.SENIOR
+    elif user.rankScore >= 100:
+        user.rank = CustomUser.Rank.JUNIOR
+    else:
+        user.rank = CustomUser.Rank.FRESHMAN
+
+        
+
 class AnswerUpvoteAPIView(APIView):
     """Allow users to add/remove a upvotes to/from an answer instance."""
     serializer_class = AnswerSerializer
@@ -84,9 +94,16 @@ class AnswerUpvoteAPIView(APIView):
         """Remove request.user from the upvoters queryset of an answer instance."""
         answer = get_object_or_404(Answer, answerId=answerId)
         user = request.user
+        author = answer.author
 
         answer.upvoters.remove(user)
+        user.rankScore -= SELF_VOTE_SCORE
+        author.rankScore -= UPVOTE_SCORE
+        set_user_rank(user)
+        set_user_rank(author)
         answer.ranking -= 1
+        user.save()
+        author.save()
         answer.save()
 
         serializer_context = {"request": request}
@@ -103,16 +120,16 @@ class AnswerUpvoteAPIView(APIView):
         if user in answer.downvoters.all():
             answer.downvoters.remove(user)
             answer.ranking += 1
-            # user.rank_score -= SELF_VOTE_SCORE
-            # author.rank_score -= DOWNVOTE_SCORE
+            user.rankScore -= SELF_VOTE_SCORE
+            author.rankScore -= DOWNVOTE_SCORE
         
-        print("success")
         answer.upvoters.add(user)
         answer.ranking += 1
+        user.rankScore += SELF_VOTE_SCORE
+        author.rankScore += UPVOTE_SCORE
+        set_user_rank(user)
+        set_user_rank(author)
         answer.save()
-
-        # user.rank_score += SELF_VOTE_SCORE
-        # author.rank_score += UPVOTE_SCORE
         user.save()
         author.save()
 
@@ -132,9 +149,16 @@ class AnswerDownvoteAPIView(APIView):
         """Remove request.user from the downvoters queryset of an answer instance."""
         answer = get_object_or_404(Answer, answerId=answerId)
         user = request.user
+        author = answer.author
 
         answer.downvoters.remove(user)
+        user.rankScore -= SELF_VOTE_SCORE
+        author.rankScore -= DOWNVOTE_SCORE
+        set_user_rank(user)
+        set_user_rank(author)
         answer.ranking += 1
+        user.save()
+        author.save()
         answer.save()
 
         serializer_context = {"request": request}
@@ -146,14 +170,24 @@ class AnswerDownvoteAPIView(APIView):
         """Add request.user to the downvoters queryset of an answer instance."""
         answer = get_object_or_404(Answer, answerId=answerId)
         user = request.user
+        author = answer.author
 
         if user in answer.upvoters.all():
             answer.upvoters.remove(user)
             answer.ranking -= 1
+            user.rankScore -= SELF_VOTE_SCORE
+            author.rankScore -= UPVOTE_SCORE
+
         
         answer.downvoters.add(user)
         answer.ranking -= 1
+        user.rankScore += SELF_VOTE_SCORE
+        author.rankScore += DOWNVOTE_SCORE
+        set_user_rank(user)
+        set_user_rank(author)
         answer.save()
+        user.save()
+        author.save()
 
         serializer_context = {"request": request}
         serializer = self.serializer_class(answer, context=serializer_context)
@@ -224,7 +258,6 @@ def get_labelset(kwarg_question):
     
     none_qs = QuestionLabel.objects.none()
     qs = list(chain(none_qs, label_list))
-
     return qs
 
 def getAverageNumericLabel(queryset, output_label_user):
@@ -386,10 +419,6 @@ class SimilarQuestionsAPIView(generics.ListAPIView):
         base_labels = get_labelset(kwarg_question)
         base_topics = get_topicset(kwarg_question)
 
-        print(base_labels)
-        print("hey")
-        print(base_topics)
-
         questions = Question.objects.exclude(questionId=kwarg_question)\
                         .only("questionId", "slug")
 
@@ -397,66 +426,73 @@ class SimilarQuestionsAPIView(generics.ListAPIView):
         for q in questions:
             d = compute_distance(q.questionId, base_labels, base_topics)
             distances[q.slug] = d
-        
+
         # get top 3 results from dict
         similar_slugs = sorted(distances, key=distances.get, reverse=False)[:3]
-        
-        return Question.objects.filter(slug=similar_slugs)
+        return Question.objects.filter(slug__in=similar_slugs)
 
 
 def compute_label_distance(labels, other_labels):
     """computes distance between group of labels"""
+    if not labels or not other_labels:
+        return 400
 
-    diff_val = \
-        labels.get(labelName="Difficulty")\
-            .values("labelValue")["labelValue"]
-    other_diff_val = \
-        other_labels.get(labelName="Difficulty")\
-            .values("labelValue")["labelValue"]
-    
-    diff_d = 2 * abs( int(diff_val) \
-                            - int(other_diff_val) )
+    df_v, o_df_v, imp_v, o_imp_v, typ_v, o_typ_v, pnts_v, o_pnts_v \
+            = ('', '', '', '', '', '', '', '')
 
-    imp_val = \
-        labels.get(labelName="Importance")\
-            .values("labelValue")["labelValue"]
-    other_imp_val = \
-        other_labels.get(labelName="Importance")\
-            .values("labelValue")["labelValue"]
-    
-    imp_d = 2 * abs( int(imp_val) \
-                        - int(other_imp_val) )
+    for l in labels:
+        if l.labelName == "Difficulty":
+            df_v = int(l.labelValue)
+        elif l.labelName == "Importance":
+            imp_v = int(l.labelValue)
+        elif l.labelName == "Question Type":
+            typ_v = l.labelValue
+        elif l.labelName == "Points Precentage":
+            pnts_v = l.labelValue
 
-    type_val = \
-        labels.get(labelName="Question Type")\
-            .values("labelValue")["labelValue"]
-    other_type_val = \
-        other_labels.get(labelName="Question Type")\
-            .values("labelValue")["labelValue"]
+    for l in other_labels:
+        if l.labelName == "Difficulty":
+            o_df_v = int(l.labelValue)
+        elif l.labelName == "Importance":
+            o_imp_v = int(l.labelValue)
+        elif l.labelName == "Question Type":
+            o_typ_v = l.labelValue
+        elif l.labelName == "Points Precentage":
+            o_pnts_v = l.labelValue
+
+
+    if df_v == '' or o_df_v == '':
+        diff_d = 20
+    else:
+        diff_d = 2 * abs( int(df_v) - int(o_df_v) )
+
+    if imp_v == '' or o_imp_v == '':
+        imp_d = 20
+    else:
+        imp_d = 2 * abs( int(imp_v) - int(o_imp_v) )
     
-    type_d = 0 if (type_val == other_type_val) else 5
-    
-    points_val = \
-        labels.get(labelName="Points Precentage")\
-            .values("labelValue")["labelValue"]
-    other_points_val = \
-        other_labels.get(labelName="Points Precentage")\
-            .values("labelValue")["labelValue"]
+    if typ_v == '' or o_typ_v == '':
+        type_d = 10
+    else:
+        type_d = 0 if (typ_v == o_typ_v) else 5
     
     # todo: change this
-    points_d = 0 if (points_val == other_points_val) else 5
+    if pnts_v == '' or o_pnts_v == '':
+        points_d = 10
+    else:
+        points_d = 0 if (pnts_v == o_pnts_v) else 5
 
     return diff_d + imp_d + type_d + points_d
 
 
 def compute_topic_distance(topics, other_topics):
-    topics_vals = \
-        topics.all().values_list("labelValue")[0]
-    o_topics_val = \
-        other_topics.all().values_list("labelValue")[0]
-    
-    n = len(set(topics_vals).intersection(o_topics_val))
-    m = len(set(topics_vals).union(set(o_topics_val)))
+    if not topics:
+        return 500
+    topics_vals = [t.topicName for t in topics]
+    o_topics_vals = [t.topicName for t in other_topics]
+
+    n = len(set(topics_vals).intersection(o_topics_vals))
+    m = len(set(topics_vals).union(set(o_topics_vals)))
 
     return (1 - n / m) * 10
 
