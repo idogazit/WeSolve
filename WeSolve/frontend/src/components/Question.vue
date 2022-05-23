@@ -106,7 +106,6 @@ export default {
       form: {
                 body: "",
                 answerPDF: null,
-            }
       }
     }
   },
@@ -190,13 +189,12 @@ export default {
               this.answers.unshift(data)
             });
 
-        let endpoint = `/api/questions/${this.slug}/answer/`;
-        apiService(endpoint, "POST", answerData)
-            .then(data => {
-              this.answers.unshift(data)
-            })
-
         this.newAnswerBody = null;
+        this.answerPDF = null;
+        this.form = {
+                body: "",
+                answerPDF: null,
+        };
         this.showForm = false;
         this.userHasAnswered = true;
         if (this.error) {
