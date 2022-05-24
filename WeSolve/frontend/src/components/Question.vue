@@ -186,8 +186,9 @@ export default {
         axios
           .post(`/api/questions/${this.slug}/answer/`, formData, config)
           .then(data => {
+              location.reload();
               this.answers.unshift(data)
-            });
+            })
 
         this.newAnswerBody = null;
         this.answerPDF = null;
