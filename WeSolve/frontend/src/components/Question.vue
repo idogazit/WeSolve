@@ -73,7 +73,9 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { apiService } from "@/common/api.service.js";
+import { CSRF_TOKEN } from "@/common/csrf_token.js"
 import AnswerComponent from "@/components/Answer.vue";
 import QuestionActions from "@/components/QuestionActions.vue";
 import LabelsTopics from "@/components/LabelsTopics.vue";
@@ -103,7 +105,11 @@ export default {
       userHasAnswered: false,
       showForm: false,
       requestUser: null,
-      answerPDF: null
+      answerPDF: null,
+      form: {
+                body: "",
+                answerPDF: null,
+      }
     }
   },
   computed: {
@@ -163,22 +169,36 @@ export default {
     },
     onSubmit() {
       // Tell the REST API to create a new answer for this question based on the user input, then update some data properties
-      let answerData = {};
+      let formData = new FormData();
       if (!this.newAnswerBody && !this.answerPDF) {
         this.error = "You can't send an empty answer!";
       } else {
         if (this.newAnswerBody) {
-          answerData.body = this.newAnswerBody;
+          formData.append("body", this.newAnswerBody);
         }
         if (this.answerPDF) {
-          answerData.answerPDF = this.answerPDF;
+          formData.append("answerPDF",this.answerPDF);
         }
-        let endpoint = `/api/questions/${this.slug}/answer/`;
-        apiService(endpoint, "POST", answerData)
-            .then(data => {
+
+        let config = {
+          headers: {
+            'X-CSRFTOKEN': CSRF_TOKEN
+          }
+        }
+
+        axios
+          .post(`/api/questions/${this.slug}/answer/`, formData, config)
+          .then(data => {
+              location.reload();
               this.answers.unshift(data)
             })
+
         this.newAnswerBody = null;
+        this.answerPDF = null;
+        this.form = {
+                body: "",
+                answerPDF: null,
+        };
         this.showForm = false;
         this.userHasAnswered = true;
         if (this.error) {
