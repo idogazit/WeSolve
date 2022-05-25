@@ -17,6 +17,7 @@ for client side:
 ```
 cd WeSolve/frontend
 npm install
+npm install axios --save
 npm run serve
 ```
 

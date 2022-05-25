@@ -4,7 +4,7 @@
       <div class="my-4">
         <h2>User Profile</h2>
         <img :src="userPic" alt="">
-        <h3>{{ this.userFullName }}</h3>
+        <h3 class="badge badge-info">{{ this.userFullName }}</h3>
         <div>
           <p class="user-details">{{ this.userEmail }}</p>
         </div>
@@ -93,12 +93,12 @@ h3 {
   margin-left: auto;
   margin-right: auto;
   padding: 12px;
+  font-size: 1.3em;
   position: relative;
   display: inline-block;
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  background-color: #98c9ef;
   border-radius: 30px 30px 30px 30px;
 }
 
@@ -108,8 +108,8 @@ img {
   border-radius: 50%;
   padding: 5px;
   display: block;
-  margin-bottom: 1em;
-  margin-top: 1em;
+  margin-bottom: 1.8em;
+  margin-top: 0.5em;
   margin-left: auto;
   margin-right: auto;
   vertical-align: middle;
