@@ -11,6 +11,7 @@ class AnswerSerializer(serializers.ModelSerializer):
     user_has_upvoted = serializers.SerializerMethodField()
     user_has_downvoted = serializers.SerializerMethodField()
     question_slug = serializers.SerializerMethodField()
+    is_teacher_approved = serializers.SerializerMethodField()
 
     class Meta:
         model = Answer
@@ -37,6 +38,9 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     def get_question_slug(self, instance):
         return instance.question.slug
+    
+    def get_is_teacher_approved(self, instance):
+        return instance.upvoters.filter(isTeacher=True).exists()
 
 
 class QuestionSerializer(serializers.ModelSerializer):
