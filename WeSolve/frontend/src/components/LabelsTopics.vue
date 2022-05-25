@@ -16,7 +16,7 @@
                     <label>Add Topic:</label>
                 </div>
                 <div class="form-group">
-                  <input type="text" v-model="selectedTopicName">
+                  <input type="text" v-model="selectedTopicName" maxlength="20">
                 </div>
                 <div class="form-group m-2">
                     <button
