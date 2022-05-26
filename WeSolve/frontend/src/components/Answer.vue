@@ -24,10 +24,9 @@
         :disabled="userUpvotedAnswer || isAnswerAuthor"
         ><strong>Downvote [{{ downvotesCounter }}]</strong>
       </button>
-      
        <!-- "https://img.icons8.com/dotty/80/26e07f/assessments.png" -->
-      <img class="mr-1" id="teacherApproval" v-if="!answer.is_teacher_approved" src="https://img.icons8.com/officel/40/000000/test-partial-passed.png" />
-      <label id="teacherLine" class="aladin">This answer is approved by a teacher!</label>
+      <img class="mr-1" id="teacherApproval" v-if="answer.is_teacher_approved" src="https://img.icons8.com/officel/40/000000/test-partial-passed.png" />
+      <label id="teacherLine" class="aladin" v-if="answer.is_teacher_approved">This answer is approved by a teacher!</label>
     </div>
     <p>{{ answer.body }}</p>
     <div v-if="answer.answerPDF !==null">
