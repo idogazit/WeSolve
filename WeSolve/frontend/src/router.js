@@ -23,7 +23,7 @@ export default new Router({
     {
       path: "/question/:slug",
       name: "question",
-      component: QuestionView,
+      component: QuestionView
     },
     {
       path: "/profile",

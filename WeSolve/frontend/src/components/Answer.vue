@@ -3,13 +3,9 @@
     <p class="text-muted">
       <strong>{{ answer.author }}</strong> &#8901; {{ answer.created_at }}
     </p>
-    <p>{{ answer.body }}</p>
-    <div v-if="answer.answerPDF !==null">
-      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="700px" width="100%">
-    </div>
     <div>
       <button
-        class="btn btn-sm"
+        class="btn btn-sm mr-1"
         @click="toggleUpvote"
         :class="{
           'btn-success': userUpvotedAnswer,
@@ -19,7 +15,7 @@
         ><strong>Upvote [{{ upvotesCounter }}]</strong>
       </button>
       <button
-        class="btn btn-sm"
+        class="btn btn-sm  mr-1"
         @click="toggleDownvote"
         :class="{
           'btn-danger': userDownvotedAnswer,
@@ -28,6 +24,14 @@
         :disabled="userUpvotedAnswer || isAnswerAuthor"
         ><strong>Downvote [{{ downvotesCounter }}]</strong>
       </button>
+      
+       <!-- "https://img.icons8.com/dotty/80/26e07f/assessments.png" -->
+      <img class="mr-1" id="teacherApproval" v-if="!answer.is_teacher_approved" src="https://img.icons8.com/officel/40/000000/test-partial-passed.png" />
+      <label id="teacherLine" class="aladin">This answer is approved by a teacher!</label>
+    </div>
+    <p>{{ answer.body }}</p>
+    <div v-if="answer.answerPDF !==null">
+      <embed :src="getAnswerPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="700px" width="100%">
     </div>
     <hr>
   </div>
@@ -107,3 +111,14 @@ export default {
   }
 }
 </script>
+<style>
+#teacherApproval {
+  width: 35px;
+  height: auto;
+}
+#teacherLine {
+  color: #25e180;
+  color: #daac63;
+  font-size: 20px;
+}
+</style>
