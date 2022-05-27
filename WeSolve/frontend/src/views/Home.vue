@@ -12,7 +12,9 @@
             >{{ question.content }}
           </button>
         </h2>
-        <p>Answers: {{ question.answers_count }}</p>
+        <p>
+          <img class="answer-icon" src="https://img.icons8.com/windows/32/000000/chat-message.png"/>
+          Answers: <span class="question-author"> {{ question.answers_count }}</span></p>
         <hr>
       </div>
     </div>
@@ -251,5 +253,10 @@ export default {
 .question-link:hover {
   color: #343A40;
   text-decoration: none;
+}
+
+.answer-icon {
+  width: 25px;
+  height: auto;
 }
 </style>

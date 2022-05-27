@@ -25,7 +25,7 @@
                         class="btn btn-success btn-sm"
                         >Submit Topic
                     </button>
-                    <button class="btn btn-default ml-2 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Topic votes are accumulated! Adding a topic vote will effect the topic significance of the question">
+                    <button class="btn btn-default ml-2 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Topic votes are accumulated! Adding a topic vote will affect the topic significance of the question">
                       <img class="info" src="https://img.icons8.com/fluency/48/000000/info.png"/>
                     </button>
                     <button class="btn btn-default m-0 p-0">
