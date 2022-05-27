@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from questions.models import Answer, Question, Exam, Label, QuestionLabel, QuestionTopic
+from users.models import Course, School
 
 
 
@@ -95,4 +96,20 @@ class QuestionTopicListSerializer(serializers.ModelSerializer):
     
     def get_count_votes(self, instance):
         return QuestionTopic.objects.filter(topicName=instance.topicName, questionId=instance.questionId).count()
+
+class BreadcrumbsSerializer(serializers.ModelSerializer):
+    schoolName = serializers.SerializerMethodField()
+    facultyName = serializers.SerializerMethodField()
+        
+
+    class Meta:
+        model = Exam
+        fields = "__all__"
+
+    def get_schoolName(self, instance):
+        return instance.courseName.schoolName.__str__()
+    
+    def get_facultyName(self, instance):
+        return instance.courseName.schoolName.facultyName.__str__()
+
 

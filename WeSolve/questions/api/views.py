@@ -13,9 +13,10 @@ from questions.api.serializers import (AnswerSerializer,
                                        ExamSerializer, 
                                        LabelListSerializer,
                                        QuestionTopicListSerializer,
-                                       QuestionLabelSerializer)
+                                       QuestionLabelSerializer,
+                                       BreadcrumbsSerializer)
 from questions.models import Answer, Question, Exam, QuestionLabel, Label, QuestionTopic
-from questions.api.renderers import examRenderer
+from questions.api.renderers import examRenderer, crumbsRenderer
 from users.models import CustomUser
 from users.models import Topic
 
@@ -514,3 +515,12 @@ def compute_distance(other_question, labels, topics):
     a = compute_label_distance(labels, other_labels)
     b = compute_topic_distance(topics, other_topics)
     return a + b
+
+
+
+class breadCrumbsAPIView(generics.RetrieveAPIView):
+    serializer_class = BreadcrumbsSerializer
+    renderer_classes = [crumbsRenderer]
+    lookup_field = "examId"
+    queryset = Exam.objects.all()
+

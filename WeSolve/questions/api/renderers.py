@@ -18,3 +18,18 @@ class examRenderer(JSONRenderer):
 
         
         return super().render(data, accepted_media_type, renderer_context)
+
+class crumbsRenderer(JSONRenderer):
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        if data is None:
+            return b''
+        examTime = (str(data["year"]) + 
+                    data["semester"] + 
+                    data["examType"])
+        data["examTime"] = examTime
+        del data["year"], data["semester"], data["examType"]
+        
+
+        
+        return super().render(data, accepted_media_type, renderer_context)
