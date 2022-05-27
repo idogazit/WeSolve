@@ -6,9 +6,6 @@
         v-if="isQuestionAuthor"
         :slug="question.slug"
       />
-      <p class="mb-0">Posted by:
-        <span class="author-name">{{ question.author }}</span>
-      </p>
       <p>{{ question.created_at }}</p>
       <p v-if="!is_spammer">
       <LabelsTopics :questionId="question.questionId" />

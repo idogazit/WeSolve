@@ -4,22 +4,17 @@
             <h1 class="mb-3">Similar Questions:</h1>
             <div v-for="(question, index) in questions"
                 :key="question.pk">
-                <p class="mb-0">Posted by:
-                    <span class="question-author">{{ question.author }}</span>
-                </p>
                 <p class="mb-0">
                     {{ questionCrumbs[index].courseName }}
                     <span class="question-author">\</span>
                     {{ questionCrumbs[index].examTime }}
                 </p>
                 <h2>
-                <!--<router-link :to="{ name: 'question',  params: {slug: question.slug} }" >-->
                     <button
                         @click="renderSimQuestion(question.slug, questionCrumbs[index], question.questionId)"
                         class="question-link"
                         >{{ question.content }}
                     </button>
-                <!--</router-link>-->
                 </h2>
                 <p>Answers: {{ question.answers_count }}</p>
                 <hr>

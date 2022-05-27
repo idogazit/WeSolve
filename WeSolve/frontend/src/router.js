@@ -7,7 +7,6 @@ import AboutUsView from "./views/AboutUs.vue";
 import ContactUsView from "./views/ContactUs.vue";
 import NotFound from "./views/NotFound.vue";
 import QuestionEditor from "./views/QuestionEditor.vue";
-import QuestionView from "./views/Question.vue";
 
 
 Vue.use(Router);
@@ -19,11 +18,6 @@ export default new Router({
       path: "/search",
       name: "search",
       component: HomeView,
-    },
-    {
-      path: "/question/:slug",
-      name: "question",
-      component: QuestionView
     },
     {
       path: "/profile",

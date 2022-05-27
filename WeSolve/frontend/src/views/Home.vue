@@ -5,9 +5,6 @@
     <div v-if="showQuestions" class="container mt-2">
       <div v-for="question in questions"
            :key="question.pk">
-        <p class="mb-0">Posted by:
-          <span class="question-author">{{ question.author }}</span>
-        </p>
         <h2>
           <button
             @click="chooseQuestion(question.slug)"
