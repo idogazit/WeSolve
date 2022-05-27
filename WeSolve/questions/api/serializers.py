@@ -94,5 +94,5 @@ class QuestionTopicListSerializer(serializers.ModelSerializer):
         fields = "__all__"
     
     def get_count_votes(self, instance):
-        return QuestionTopic.objects.filter(topicName=instance.topicName).count()
+        return QuestionTopic.objects.filter(topicName=instance.topicName, questionId=instance.questionId).count()
 
