@@ -10,13 +10,18 @@
         <span class="author-name">{{ question.author }}</span>
       </p>
       <p>{{ question.created_at }}</p>
+      <p v-if="!is_spammer">
       <LabelsTopics :questionId="question.questionId" />
+      </p>
       <p>
         <embed :src="getQuestionPDF" type="application/pdf" frameBorder="0" scrolling="auto" height="600px" width="100%">
       </p>
       <hr>
       <div v-if="userHasAnswered">
         <p class="answer-added">You've written an answer!</p>
+      </div>
+      <div v-else-if="is_spammer">
+        <p class="answer-added" style="color:red">Your rank score is too low to perform any action! Contact the admin!</p>
       </div>
       <div v-else-if="showForm">
         <form class="card" enctype="multipart/form-data" @submit.prevent="onSubmit">
@@ -106,6 +111,7 @@ export default {
       showForm: false,
       requestUser: null,
       answerPDF: null,
+      is_spammer: false,
       form: {
                 body: "",
                 answerPDF: null,
@@ -130,6 +136,13 @@ export default {
     setRequestUser() {
       // the username has been set to localStorage by the App.vue component
       this.requestUser = window.localStorage.getItem("username");
+      let endpoint = "/api/users/current/";
+      apiService(endpoint)
+        .then(data => {
+          if (data["rankScore"] < -100){
+            this.is_spammer = true;
+          }   
+        })
     },
     getQuestionData() {
       // get the details of a question instance from the REST API and call setPageTitle

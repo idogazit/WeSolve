@@ -39,7 +39,6 @@ export default {
     methods: {
         getSimilarQuestion() {
             // need to get the similar questions by the selected question slug
-            console.log(this.questionId)
             let endpoint = `/api/questions/${ this.questionId }/similar/`;
               apiService(endpoint)
                   .then(data => {

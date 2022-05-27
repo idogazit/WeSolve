@@ -29,6 +29,7 @@ DOWNVOTE_SCORE = -2
 ANSWER_SCORE = 10
 ADDED_LABEL_SCORE = 3
 ADDED_TOPIC_SCORE = 3
+SPAMMER_SCORE = -100
 
 
 class AnswerCreateAPIView(generics.CreateAPIView):
@@ -37,36 +38,14 @@ class AnswerCreateAPIView(generics.CreateAPIView):
     serializer_class = AnswerSerializer
     permission_classes = [IsAuthenticated]
 
-    """
-    parser_classes = (MultiPartParser)
 
-
-    def post(self, request, slug):
-        request_user = self.request.user
-        kwarg_slug = slug
-        kwarg_body = self.request.data.get('body')
-        kwarg_answerPDF = request.FILES
-        print(kwarg_answerPDF)
-        question = get_object_or_404(Question, slug=kwarg_slug)
-
-        if question.answers.filter(author=request_user).exists():
-            raise ValidationError("You have already answered this Question!")
-        
-        answer = Answer.objects.create(question=question,
-                                        author=request_user, 
-                                        body=kwarg_body, 
-                                        answerPDF=kwarg_answerPDF)
-
-        serializer_context = {"request": request}
-        serializer = self.serializer_class(answer, context=serializer_context)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    """
-    
     def perform_create(self, serializer):
         request_user = self.request.user
         kwarg_slug = self.kwargs.get("slug")
         question = get_object_or_404(Question, slug=kwarg_slug)
+
+        if self.request.user.rankScore < SPAMMER_SCORE:
+            raise ValidationError("Your rank score is too low to perform this action!")
 
         if question.answers.filter(author=request_user).exists():
             raise ValidationError("You have already answered this Question!")
@@ -100,6 +79,9 @@ class AnswerUpvoteAPIView(APIView):
         user = request.user
         author = answer.author
 
+        if self.request.user.rankScore < SPAMMER_SCORE:
+            raise ValidationError("Your rank score is too low to perform this action!")
+
         answer.upvoters.remove(user)
         user.rankScore -= SELF_VOTE_SCORE
         author.rankScore -= UPVOTE_SCORE
@@ -120,6 +102,9 @@ class AnswerUpvoteAPIView(APIView):
         answer = get_object_or_404(Answer, answerId=answerId)
         user = request.user
         author = answer.author
+
+        if self.request.user.rankScore < SPAMMER_SCORE:
+            raise ValidationError("Your rank score is too low to perform this action!")
 
         if user in answer.downvoters.all():
             answer.downvoters.remove(user)
@@ -155,6 +140,9 @@ class AnswerDownvoteAPIView(APIView):
         user = request.user
         author = answer.author
 
+        if self.request.user.rankScore < SPAMMER_SCORE:
+            raise ValidationError("Your rank score is too low to perform this action!")
+
         answer.downvoters.remove(user)
         user.rankScore -= SELF_VOTE_SCORE
         author.rankScore -= DOWNVOTE_SCORE
@@ -175,6 +163,9 @@ class AnswerDownvoteAPIView(APIView):
         answer = get_object_or_404(Answer, answerId=answerId)
         user = request.user
         author = answer.author
+
+        if self.request.user.rankScore < SPAMMER_SCORE:
+            raise ValidationError("Your rank score is too low to perform this action!")
 
         if user in answer.upvoters.all():
             answer.upvoters.remove(user)
@@ -312,6 +303,10 @@ class QuestionLabelListAPIView(generics.ListCreateAPIView):
         questionObject = get_object_or_404(Question, questionId=question)
         user = request.user
         label = get_object_or_404(Label, labelName=request.data.get('labelName'))
+
+        if self.request.user.rankScore < SPAMMER_SCORE:
+            raise ValidationError("Your rank score is too low to perform this action!")
+
         if QuestionLabel.objects.filter(questionId=questionObject, labeledByUser=user, labelName=label).exists():
             # consider possibility of updating rating, maybe change to ListCreateUpdateAPIView
             raise ValidationError("You have already gave rating to this Question Label!")
@@ -404,6 +399,9 @@ class QuestionTopicAPIView(generics.ListCreateAPIView):
         user = request.user
         question = get_object_or_404(Question, questionId=questionId)
         topicName = str.lower(request.data.get('topicName'))
+
+        if self.request.user.rankScore < SPAMMER_SCORE:
+            raise ValidationError("Your rank score is too low to perform this action!")
 
         if not Topic.objects.filter(topicName=topicName):
             Topic.objects.create(topicName=topicName)
