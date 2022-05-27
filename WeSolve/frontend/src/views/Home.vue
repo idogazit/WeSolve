@@ -19,7 +19,7 @@
         <hr>
       </div>
     </div>
-    <QuestionView v-if="showChosenQuestion" :slug="chosenQuestionSlug" />
+    <QuestionView v-if="showChosenQuestion" :slug="chosenQuestionSlug" @renderCrumbsAndExamId="renderCrumbsAndExamId" />
   </div>
 </template>
 
@@ -136,6 +136,17 @@ export default {
     },
   },
   methods: {
+    renderCrumbsAndExamId(questionCrumbs) {
+      let newCrumbs = ['TAU']
+      newCrumbs.push(questionCrumbs.facultyName)
+      newCrumbs.push(questionCrumbs.schoolName)
+      newCrumbs.push(questionCrumbs.courseName)
+      newCrumbs.push(questionCrumbs.examTime)
+      this.crumbs = newCrumbs
+      this.examsId = [questionCrumbs.examId]
+      this.chosenExamIndex = 0
+      this.$forceUpdate();
+    },
     chooseQuestion(slug) {
       this.showChosenQuestion = true
       this.showQuestions = false

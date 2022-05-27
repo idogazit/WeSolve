@@ -73,7 +73,7 @@
         </button>
       </div>
     </div>
-    <SimilarQuestions :questionId="question.questionId" />
+    <SimilarQuestions :questionId="question.questionId" @renderSimQuestion="renderSimQuestion"/>
   </div>
 </template>
 
@@ -129,6 +129,14 @@ export default {
     }
   },
   methods: {
+    renderSimQuestion(slug, questionCrumbs) {
+      console.log("YEAYYEYAYEA")
+      console.log(slug)
+      //console.log(questionCrumbs.courseName)
+      this.getQuestionData(slug)
+      this.$emit('renderCrumbsAndExamId', questionCrumbs);
+
+    },
     setPageTitle(title) {
       // set a given title string as the webpage title
       document.title = title;
@@ -144,9 +152,13 @@ export default {
           }   
         })
     },
-    getQuestionData() {
+    getQuestionData(newSlug = null) {
       // get the details of a question instance from the REST API and call setPageTitle
       let endpoint = `/api/questions/${this.slug}/`;
+      if (newSlug) {
+        console.log('helpful')
+        endpoint = `/api/questions/${newSlug}/`;
+      }
       apiService(endpoint)
           .then(data => {
             if (data) {
