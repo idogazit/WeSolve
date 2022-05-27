@@ -1,16 +1,17 @@
 <template>
     <div class="bg-transparent">
         <ul class="list-group list-group-horizontal-sm">
-            <li class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="topic in getTopics" :key="topic"><span class="badge badge-danger topic-label-tag">{{ topic["topicName"] }}</span></li>
+            <li class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="topic in getTopics" :key="topic"><span class="badge badge-danger topic-label-tag">{{ topic["topicName"] }} [{{topic["count_votes"]}}]</span></li>
             <li class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="label in getLabels" :key="label"><span class="badge badge-warning topic-label-tag">{{ label["labelName"] }}: {{ label["labelValue"] }}</span></li>
             <li v-if="showForm == false" class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3">
-                <button class="btn btn-default m-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Add Label">
-                    <img @click="enableShowForm" id="plus" src="https://img.icons8.com/external-tanah-basah-glyph-tanah-basah/48/26e07f/external-plus-essentials-tanah-basah-glyph-tanah-basah-2.png" />
+                <button class="btn btn-default m-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Add Label or Topic">
+                    <img @click="enableShowForm" class="plus" src="https://img.icons8.com/external-tanah-basah-glyph-tanah-basah/48/26e07f/external-plus-essentials-tanah-basah-glyph-tanah-basah-2.png" />
                 </button>
             </li>
         </ul>
         <div v-if="showForm" class="container">
-
+          <div class="form-group m-2">
+          </div>
             <form id="topic-form" class="form-inline" @submit.prevent="onTopicSubmit">
                 <div class="form-group m-2">
                     <label>Add Topic:</label>
@@ -23,6 +24,9 @@
                         type="submit"
                         class="btn btn-success btn-sm"
                         >Submit Topic
+                    </button>
+                    <button class="btn btn-default ml-2 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Topic votes are accumulated! Adding a topic vote will effect the topic significance of the question">
+                      <img class="info" src="https://img.icons8.com/fluency/48/000000/info.png"/>
                     </button>
                     <button class="btn btn-default m-0 p-0">
                         <img class="m-2" @click="disableShowForm" id="close2" src="https://img.icons8.com/flat-round/64/26e07f/delete-sign.png" />
@@ -80,7 +84,7 @@ export default {
           selectedLabelName: "",
           selectedLabelValue: "",
           selectedTopicName: "",
-          showForm: false
+          showForm: false,
         }
     },
     computed: {
@@ -177,8 +181,13 @@ export default {
 body {
     opacity: 0;
 }
-#plus {
+.plus {
   width: 25px;
+  height: auto;
+}
+
+.info {
+  width: 29px;
   height: auto;
 }
 #close {

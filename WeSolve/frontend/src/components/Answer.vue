@@ -3,7 +3,7 @@
     <p class="text-muted">
       <strong>{{ answer.author }}</strong> &#8901; {{ answer.created_at }}
     </p>
-    <div>
+    <div v-if="!is_spammer">
       <button
         class="btn btn-sm mr-1"
         @click="toggleUpvote"
@@ -55,7 +55,8 @@ export default {
       userUpvotedAnswer: this.answer.user_has_upvoted,
       upvotesCounter: this.answer.upvotes_count,
       userDownvotedAnswer: this.answer.user_has_downvoted,
-      downvotesCounter: this.answer.downvotes_count
+      downvotesCounter: this.answer.downvotes_count,
+      is_spammer: false
     }
   },
   computed: {
@@ -107,7 +108,20 @@ export default {
       // emit an event to delete an answer instance
       this.$emit("delete-answer", this.answer)
     },
-  }
+    setSpammer() {
+      // the username has been set to localStorage by the App.vue component
+      let endpoint = "/api/users/current/";
+      apiService(endpoint)
+        .then(data => {
+          if (data["rankScore"] < -100){
+            this.is_spammer = true;
+          }   
+        })
+    }
+  },
+  created() {
+    this.setSpammer();
+  },
 }
 </script>
 <style>

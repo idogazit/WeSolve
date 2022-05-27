@@ -14,15 +14,15 @@
         <div v-else>
           <p class="user-details">&#127894; Rank: {{ this.userRank }} &#127894;</p>
         </div>
-        <ul>
-          <li>
-            <h4 class="my-courses">My Courses:</h4>
-          </li>
-          <h4 v-if="userCourses.length === 0">No courses yet</h4>
-          <li v-else v-for="course in userCourses" :key="course">
-            &#127891; {{ course.replace("_", " - ") }}
-          </li>
-        </ul>
+<!--        <ul>-->
+<!--          <li>-->
+<!--            <h4 class="my-courses">My Courses:</h4>-->
+<!--          </li>-->
+<!--          <h4 v-if="userCourses.length === 0">No courses yet</h4>-->
+<!--          <li v-else v-for="course in userCourses" :key="course">-->
+<!--            &#127891; {{ course.replace("_", " - ") }}-->
+<!--          </li>-->
+<!--        </ul>-->
       </div>
     </div>
   </div>
@@ -40,7 +40,7 @@ export default {
       userRank: "",
       userPic: "",
       userIsTeacher: false,
-      userCourses: [],
+      // userCourses: [],
       userRankScore: 0,
       rankMap: {
         0 : "Freshman",
@@ -61,7 +61,7 @@ export default {
           this.userPic = require("../../../users/uploads/userPics/".concat(pic_name));
           this.userIsTeacher = data["isTeacher"];
           this.userRankScore = data["rankScore"];
-          this.userCourses = data["courses"];
+          // this.userCourses = data["courses"];
         })
     }
   },

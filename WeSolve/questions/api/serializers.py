@@ -88,10 +88,14 @@ class LabelListSerializer(serializers.ModelSerializer):
         
 
 class QuestionTopicListSerializer(serializers.ModelSerializer):
+    count_votes = serializers.SerializerMethodField()
 
     class Meta:
         model = QuestionTopic
         fields = "__all__"
+    
+    def get_count_votes(self, instance):
+        return QuestionTopic.objects.filter(topicName=instance.topicName).count()
 
 class BreadcrumbsSerializer(serializers.ModelSerializer):
     schoolName = serializers.SerializerMethodField()
