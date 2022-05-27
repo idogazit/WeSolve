@@ -1,7 +1,7 @@
 <template>
     <div class="bg-transparent">
         <ul class="list-group list-group-horizontal-sm">
-            <li class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="topic in getTopics" :key="topic"><span class="badge badge-danger topic-label-tag">{{ topic["topicName"] }}</span></li>
+            <li class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="topic in getTopics" :key="topic"><span class="badge badge-danger topic-label-tag">{{ topic["topicName"] }} [{{topic["count_votes"]}}]</span></li>
             <li class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3" v-for="label in getLabels" :key="label"><span class="badge badge-warning topic-label-tag">{{ label["labelName"] }}: {{ label["labelValue"] }}</span></li>
             <li v-if="showForm == false" class="bg-transparent list-group-item border-0 .flex-fill pr-1 pl-1 pd-3">
                 <button class="btn btn-default m-0 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Add Label or Topic">
