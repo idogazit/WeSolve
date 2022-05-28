@@ -14,6 +14,26 @@
         <div v-else>
           <p class="user-details">&#127894; Rank: {{ this.userRank }} &#127894;</p>
         </div>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="progress" style="height: 50px;">
+                  <div 
+                    class="progress-bar bg-info progress-bar-striped progress-bar-animated" 
+                    role="progressbar" 
+                    :style="getStyleForProgessBar()"
+                    :aria-valuenow="getNormalizedRank()" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100"
+                    >
+                  </div>  
+                </div>
+                 <span class="aladin" style="font-size: 16px;">
+                  {{this.userRankScore}}/{{this.progressBarMax}}
+                </span>
+            </div>
+          </div>
+        </div>
 <!--        <ul>-->
 <!--          <li>-->
 <!--            <h4 class="my-courses">My Courses:</h4>-->
@@ -47,6 +67,8 @@ export default {
         1 : "Junior",
         2 : "Senior",
       },
+      progressBarMin: 0,
+      progressBarMax: 0
     }
   },
   methods: {
@@ -62,7 +84,27 @@ export default {
           this.userIsTeacher = data["isTeacher"];
           this.userRankScore = data["rankScore"];
           // this.userCourses = data["courses"];
+          if(data["rank"] == 0) {
+            this.progressBarMax = 100
+          }
+          if(data["rank"] == 1) {
+            this.progressBarMin = 100
+            this.progressBarMax = 300
+          }
+          if(data["rank"] == 2) {
+            this.progressBarMin = 300
+            this.progressBarMax = 1000
+          }
         })
+        
+    },
+    getStyleForProgessBar() {
+      return "width: "+ this.getNormalizedRank() + "%;"
+    },
+    getNormalizedRank() {
+      const x = Math.round((this.userRankScore - this.progressBarMin) / (this.progressBarMax - this.progressBarMin) * 100)
+      console.log(x)
+      return x
     }
   },
   created() {

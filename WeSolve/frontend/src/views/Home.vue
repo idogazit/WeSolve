@@ -5,9 +5,6 @@
     <div v-if="showQuestions" class="container mt-2">
       <div v-for="question in questions"
            :key="question.pk">
-        <p class="mb-0">Posted by:
-          <span class="question-author">{{ question.author }}</span>
-        </p>
         <h2>
           <button
             @click="chooseQuestion(question.slug)"
@@ -15,11 +12,13 @@
             >{{ question.content }}
           </button>
         </h2>
-        <p>Answers: {{ question.answers_count }}</p>
+        <p>
+          <img class="answer-icon" src="https://img.icons8.com/windows/32/000000/chat-message.png"/>
+          Answers: <span class="question-author"> {{ question.answers_count }}</span></p>
         <hr>
       </div>
     </div>
-    <QuestionView v-if="showChosenQuestion" :slug="chosenQuestionSlug" />
+    <QuestionView v-if="showChosenQuestion" :slug="chosenQuestionSlug" @renderCrumbsAndExamId="renderCrumbsAndExamId" />
   </div>
 </template>
 
@@ -136,6 +135,17 @@ export default {
     },
   },
   methods: {
+    renderCrumbsAndExamId(questionCrumbs) {
+      let newCrumbs = ['TAU']
+      newCrumbs.push(questionCrumbs.facultyName)
+      newCrumbs.push(questionCrumbs.schoolName)
+      newCrumbs.push(questionCrumbs.courseName)
+      newCrumbs.push(questionCrumbs.examTime)
+      this.crumbs = newCrumbs
+      this.examsId = [questionCrumbs.examId]
+      this.chosenExamIndex = 0
+      this.$forceUpdate();
+    },
     chooseQuestion(slug) {
       this.showChosenQuestion = true
       this.showQuestions = false
@@ -243,5 +253,10 @@ export default {
 .question-link:hover {
   color: #343A40;
   text-decoration: none;
+}
+
+.answer-icon {
+  width: 25px;
+  height: auto;
 }
 </style>

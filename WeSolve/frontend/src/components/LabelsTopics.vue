@@ -17,7 +17,7 @@
                     <label>Add Topic:</label>
                 </div>
                 <div class="form-group">
-                  <input type="text" v-model="selectedTopicName" maxlength="20">
+                  <SearchAutocomplete :items="getAllTopics" v-model="selectedTopicName" @onChange="onChange"/>
                 </div>
                 <div class="form-group m-2">
                     <button
@@ -25,7 +25,7 @@
                         class="btn btn-success btn-sm"
                         >Submit Topic
                     </button>
-                    <button class="btn btn-default ml-2 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Topic votes are accumulated! Adding a topic vote will effect the topic significance of the question">
+                    <button class="btn btn-default ml-2 p-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Topic votes are accumulated! Adding a topic vote will affect the topic significance of the question">
                       <img class="info" src="https://img.icons8.com/fluency/48/000000/info.png"/>
                     </button>
                     <button class="btn btn-default m-0 p-0">
@@ -62,13 +62,18 @@
                 </div>
             </form>
 
+
         </div>
     </div>
 </template>
 
 <script>
 import { apiService } from "@/common/api.service.js";
+import SearchAutocomplete from "@/components/SearchAutocomplete";
 export default {
+    components: {
+      SearchAutocomplete
+    },
     props: {
         questionId: {
             type: String,
@@ -102,7 +107,14 @@ export default {
         },
         getLabels() {
             return this.questionLabels.results;
-        }
+        },
+        getAllTopics() {
+          const allTopicsList = [];
+          this.allTopics.results.forEach((result) => {
+              allTopicsList.push(result["topicName"]);
+          });
+          return allTopicsList;
+        },
     },
     methods: {
         enableShowForm() {
@@ -169,6 +181,9 @@ export default {
               }
           });
           return false;
+        },
+        onChange(result) {
+          this.selectedTopicName = result;
         },
     },
     created() {
