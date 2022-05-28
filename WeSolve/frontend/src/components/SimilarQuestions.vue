@@ -60,9 +60,9 @@ export default {
                         }
                     }
                   })
-            
         },
         renderSimQuestion(slug, questionCrumbs, newQuestionId) {
+            this.questionCrumbs = []
             this.$emit('renderSimQuestion', slug, questionCrumbs);
             this.getSimilarQuestion(newQuestionId)
             window.scrollTo(0,0);

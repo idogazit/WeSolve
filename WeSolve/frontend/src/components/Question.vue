@@ -60,15 +60,6 @@
         :key="answer.id"
         @delete-answer="deleteAnswer"
       />
-      <div class="my-4">
-        <p v-show="loadingAnswers">...loading...</p>
-        <button
-          v-show="next"
-          @click="getQuestionAnswers"
-          class="btn btn-sm btn-outline-success"
-          >Load More
-        </button>
-      </div>
     </div>
     <SimilarQuestions :questionId="question.questionId" @renderSimQuestion="renderSimQuestion"/>
   </div>
@@ -101,7 +92,6 @@ export default {
       question: {},
       answers: [],
       next: null,
-      loadingAnswers: false,
       newAnswerBody: null,
       error: null,
       userHasAnswered: false,
@@ -112,8 +102,21 @@ export default {
       form: {
                 body: "",
                 answerPDF: null,
-      }
+      },
+      newSlug: null
     }
+  },
+  beforeMounted() {
+    if (localStorage.newSlug) {
+      this.newSlug = localStorage.newSlug;
+    }
+  },
+  watch: {
+    newSlug: {
+      handler(newerSlug){
+        localStorage.newSlug = newerSlug;
+        }
+    },
   },
   computed: {
     isQuestionAuthor() {
@@ -127,12 +130,11 @@ export default {
   },
   methods: {
     renderSimQuestion(slug, questionCrumbs) {
-      console.log("YEAYYEYAYEA")
-      console.log(slug)
-      //console.log(questionCrumbs.courseName)
-      this.getQuestionData(slug)
+      this.newSlug = slug
+      this.getQuestionData()
+      this.getQuestionAnswers()
       this.$emit('renderCrumbsAndExamId', questionCrumbs);
-
+      location.reload();
     },
     setPageTitle(title) {
       // set a given title string as the webpage title
@@ -149,12 +151,11 @@ export default {
           }   
         })
     },
-    getQuestionData(newSlug = null) {
+    getQuestionData() {
       // get the details of a question instance from the REST API and call setPageTitle
       let endpoint = `/api/questions/${this.slug}/`;
-      if (newSlug) {
-        console.log('helpful')
-        endpoint = `/api/questions/${newSlug}/`;
+      if (this.newSlug) {
+        endpoint = `/api/questions/${this.newSlug}/`;
       }
       apiService(endpoint)
           .then(data => {
@@ -171,14 +172,16 @@ export default {
     getQuestionAnswers() {
       // get a page of answers for a single question from the REST API's paginated 'Questions Endpoint'
       let endpoint = `/api/questions/${this.slug}/answers/`;
+      if (this.newSlug) {
+        endpoint = `/api/questions/${this.newSlug}/answers/`;
+      }
+      console.log(endpoint)
       if (this.next) {
         endpoint = this.next;
       }
-      this.loadingAnswers = true;
       apiService(endpoint)
           .then(data => {
             this.answers.push(...data.results);
-            this.loadingAnswers = false;
             if (data.next) {
               this.next = data.next;
             } else {
@@ -243,6 +246,9 @@ export default {
     }
   },
   created() {
+    if (localStorage.newSlug) {
+      this.newSlug = localStorage.newSlug;
+    }
     this.getQuestionData()
     this.getQuestionAnswers()
     this.setRequestUser()
