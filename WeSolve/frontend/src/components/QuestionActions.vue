@@ -1,15 +1,15 @@
 <template>
   <div class="question-actions">
-    <router-link
-      :to="{name: 'question-editor', params: {slug: slug}}"
-      class="btn btn-sm btn-outline-secondary mr-1"
-      >Edit
-    </router-link>
-    <button
-      class="btn btn-sm btn-outline-danger"
-      @click="deleteQuestion"
-      >Delete
-    </button>
+    <!-- <router-link -->
+     <!--  :to="{name: 'question-editor', params: {slug: slug}}" -->
+    <!--   class="btn btn-sm btn-outline-secondary mr-1" -->
+    <!--   >Edit -->
+    <!-- </router-link> -->
+   <!--  <button -->
+    <!--   class="btn btn-sm btn-outline-danger" -->
+    <!--   @click="deleteQuestion" -->
+    <!--   >Delete -->
+   <!--  </button> -->
   </div>  
 </template>
 
