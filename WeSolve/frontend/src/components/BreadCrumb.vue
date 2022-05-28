@@ -34,6 +34,7 @@ export default {
         },
         selected(crumb, ci){
             this.$emit('selected', crumb, ci);
+            localStorage.removeItem('newSlug');
         }
     }
 }
