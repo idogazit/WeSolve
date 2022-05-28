@@ -15,7 +15,7 @@
           <p class="user-details">&#127894; Rank: {{ this.userRank }} &#127894;</p>
         </div>
         <div class="container">
-          <div class="row">
+          <div v-if="userRankScore >= 0" class="row">
             <div class="col-md-6 mx-auto">
                 <div class="progress" style="height: 50px;">
                   <div 
@@ -30,6 +30,44 @@
                 </div>
                  <span class="aladin" style="font-size: 16px;">
                   {{this.userRankScore}}/{{this.progressBarMax}}
+                </span>
+            </div>
+          </div>
+          <div v-if="userRankScore < 0 && userRankScore > -101" class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="progress" style="height: 50px;">
+                  <div 
+                    class="progress-bar bg-warning progress-bar-striped progress-bar-animated" 
+                    role="progressbar" 
+                    style="width: 100%; font-size: 25px;"
+                    aria-valuenow="100" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100"
+                    >
+                    {{this.userRankScore}}
+                  </div>  
+                </div>
+                <span class="aladin" style="font-size: 20px;">
+                  You have a negative rank of {{this.userRankScore}} ! Please try harder to support the community !
+                </span>
+            </div>
+          </div>
+          <div v-if="userRankScore < -100" class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="progress" style="height: 50px;">
+                  <div 
+                    class="progress-bar bg-danger progress-bar-striped progress-bar-animated" 
+                    role="progressbar" 
+                    style="width: 100%; font-size: 25px;"
+                    aria-valuenow="100" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100"
+                    >
+                    {{this.userRankScore}}
+                  </div>  
+                </div>
+                <span class="aladin" style="font-size: 20px;">
+                  Your rank is now below -100, therefore your account has been disabled!<br> Please contact support.
                 </span>
             </div>
           </div>
@@ -101,9 +139,12 @@ export default {
     getStyleForProgessBar() {
       return "width: "+ this.getNormalizedRank() + "%;"
     },
-    getNormalizedRank() {
+    getNormalizedRank() { 
+      if(this.userRankScore > 1000) {
+        this.userRankScore = 1000
+      }
+      
       const x = Math.round((this.userRankScore - this.progressBarMin) / (this.progressBarMax - this.progressBarMin) * 100)
-      console.log(x)
       return x
     }
   },
