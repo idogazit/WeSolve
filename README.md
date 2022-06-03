@@ -29,6 +29,7 @@ python manage.py runserver
 ```
 #### Open up Chrome and go to 127.0.0.1:8000 and the app is now running in development mode!
 
+
 ## Instructions for Mac/Ubuntu set up
 
 #### Download the code to your PC, unpack the zip and move inside the folder.
@@ -63,3 +64,4 @@ npm run serve
 ```
 python manage.py runserver
 ```
+#### Open up Chrome and go to 127.0.0.1:8000 and the app is now running in development mode!
