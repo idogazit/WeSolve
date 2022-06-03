@@ -12,12 +12,19 @@ class CustomUserForm(RegistrationForm):
         user = super(RegistrationForm, self).save(commit=False)
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
+
         if self.cleaned_data['user_image']:
             user.userPic = self.cleaned_data['user_image']
+
         if commit:
             user.save()
+
         return user
 
     class Meta(RegistrationForm.Meta):
         field = ('first_name','last_name','user_image')
         model = CustomUser
+
+    def clean(self):
+        if not str(self.cleaned_data['email']).endswith("tau.ac.il"):
+            raise dj_forms.ValidationError('Only TAU email accounts are allowed')
