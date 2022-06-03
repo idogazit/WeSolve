@@ -51,6 +51,7 @@ pip install -m ./requirements.txt
 ```
 cd WeSolve/frontend
 npm install
+npm install axios --save
 ```
 
 #### Run Vue JS Development Server:
