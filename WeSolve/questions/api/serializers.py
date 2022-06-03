@@ -41,7 +41,7 @@ class AnswerSerializer(serializers.ModelSerializer):
         return instance.question.slug
     
     def get_is_teacher_approved(self, instance):
-        return instance.upvoters.filter(isTeacher=True).exists()
+        return (instance.upvoters.filter(isTeacher=True).exists() or instance.author.isTeacher)
 
 
 class QuestionSerializer(serializers.ModelSerializer):
