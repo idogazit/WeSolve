@@ -73,7 +73,17 @@ class ExamSerializer(serializers.ModelSerializer):
 
 
 class QuestionLabelSerializer(serializers.ModelSerializer):
-    
+    count_votes = serializers.SerializerMethodField()
+
+    def get_count_votes(self, instance):
+        label_value = instance.labelValue
+        if str(label_value).replace('.','',1).isdigit():
+            # In case the label has a numeric value, we calculate the average of the given values, so this return the total number of values.
+            return QuestionLabel.objects.filter(labelName=instance.labelName, questionId=instance.questionId).count()
+        else:
+            # In case the label is not numeric, namely a string, we calculate the max appearances of the given string, so this return the number of appearances of given string.
+            return QuestionLabel.objects.filter(labelName=instance.labelName, labelValue=instance.labelValue, questionId=instance.questionId).count()
+
     class Meta:
         model = QuestionLabel
         fields = "__all__"
