@@ -4,14 +4,24 @@
             <h1 class="mb-3">Similar Questions:</h1>
             <div v-for="(question, index) in questions"
                 :key="question.pk">
-                <p class="mb-0">
-                    {{ questionCrumbs[index].courseName }}
+                <p v-if="index == 0" class="mb-0">
+                    {{ questionCrumb0.courseName }}
                     <span class="question-author">\</span>
-                    {{ questionCrumbs[index].examTime }}
+                    {{ questionCrumb0.examTime}}
+                </p>
+                <p  v-if="index == 1" class="mb-0">
+                    {{ questionCrumb1.courseName }}
+                    <span class="question-author">\</span>
+                    {{ questionCrumb1.examTime}}
+                </p>
+                <p v-if="index == 2" class="mb-0">
+                    {{ questionCrumb2.courseName }}
+                    <span class="question-author">\</span>
+                    {{ questionCrumb2.examTime}}
                 </p>
                 <h2>
                     <button
-                        @click="renderSimQuestion(question.slug, questionCrumbs[index], question.questionId)"
+                        @click="renderSimQuestion(question.slug, index, question.questionId)"
                         class="question-link"
                         >{{ question.content }}
                     </button>
@@ -35,10 +45,17 @@ export default {
     data () {
         return {
             questions: [],
-            questionCrumbs: []
+            questionCrumb0: null,
+            questionCrumb1: null,
+            questionCrumb2: null
         }
     },
     methods: {
+        getCourseName() {
+            
+            console.log(this.questionCrumbs[1].courseName)
+            return this.questionCrumbs[1].courseName
+        },
         getSimilarQuestion(newQuestionId) {
             // need to get the similar questions by the selected question slug
             let endpoint = `/api/questions/${ this.questionId }/similar/`;
@@ -54,16 +71,31 @@ export default {
                         apiService(endpoint)
                         .then(data2 => {
                             if (data2) {
-                                this.questionCrumbs.push(data2)
+                                    if (i == 0){
+                                        this.questionCrumb0 = data2
+                                    }
+                                    if (i == 1){
+                                        this.questionCrumb1 = data2
+                                    }
+                                    if (i == 2){
+                                        this.questionCrumb2 = data2
+                                    }
                                 }
                             })
                         }
                     }
                   })
         },
-        renderSimQuestion(slug, questionCrumbs, newQuestionId) {
-            this.questionCrumbs = []
-            this.$emit('renderSimQuestion', slug, questionCrumbs);
+        renderSimQuestion(slug, index, newQuestionId) {
+            if (index == 0){
+                this.$emit('renderSimQuestion', slug, this.questionCrumb0);
+            }
+            if (index == 1){
+                this.$emit('renderSimQuestion', slug, this.questionCrumb1);
+            }
+            if (index == 2){
+                this.$emit('renderSimQuestion', slug, this.questionCrumb2);
+            }
             this.getSimilarQuestion(newQuestionId)
             window.scrollTo(0,0);
         }
