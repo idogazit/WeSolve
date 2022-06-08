@@ -7,7 +7,7 @@ Data-Centered Crowd Sourcing Project by:
 - Ido Gazit
 - Itai Weiss
 
-Please read our documentation file ("WeSolve Documentation.pdf") and go over "Project's Related Files" for more important information about the project (including our presentations).
+Please read our documentation file ("WeSolve Documentation.pdf") and go over "Project's Related Files" folder for more important information about the project (including our presentations).
 
 ## Instructions for Windows set up
 ```python -m venv venv
