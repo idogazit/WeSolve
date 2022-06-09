@@ -45,10 +45,9 @@ python3 -m venv venv
 
 ```
 source ./venv/bin/activate
-pip install -m ./requirements.txt
+pip install -r ./requirements.txt
 ```
 
-#### Apply the migrations as usual.
 
 #### Time to install the Vue JS dependencies:
 ```
@@ -64,6 +63,10 @@ npm run serve
 
 #### Run Django's development server:
 ```
+# cd to the folder which contains the "manage.py" file
+# do the first two steps again
+# might need do to (if an error is raised): python -m pip install Pillow
+python manage.py migrate
 python manage.py runserver
 ```
 #### Open up Chrome and go to 127.0.0.1:8000 and the app is now running in development mode!
